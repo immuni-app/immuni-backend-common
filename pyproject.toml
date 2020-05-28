@@ -1,0 +1,73 @@
+[tool.black]
+line-length = 100
+exclude = '''
+(
+    \.DS_Store |
+    \.githooks |
+    \.html$ |
+    \.idea |
+    \.json$ |
+    \.pyc$ |
+    \.sql$ |
+    \.vscode |
+    \.venv |
+    node_modules
+)
+'''
+
+[tool.pylint.FORMAT]
+good-names = "f,T"
+
+[tool.pylint.MASTER]
+load-plugins = "pylint_mongoengine"
+# Pylint unfortunatly only matches file names here.
+# This should be fixed if a new version accepts folder matching.
+# We just want to ignore the files in `immuni_exposure_reporting/protobuf/models/*`
+ignore-patterns="schema_v[0-9]+_pb2.py"
+
+[tool.pylint.TYPECHECK]
+ignored-classes = "Session"
+
+[tool.pylint.messages_control]
+disable = """
+bad-continuation,
+missing-module-docstring,
+too-few-public-methods,
+unused-argument,
+unused-variable,
+"""
+
+[tool.poetry.scripts]
+checks = "scripts:checks"
+
+[tool.poetry]
+name = "immuni-common"
+version = "1.0.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+aioredis = { version = "^1.3.1", optional = true }
+celery = {version = "^4.4.2", extras = ["redis"], optional = true }
+croniter = {version = "^0.3.31", optional = true}
+gunicorn = "^20.0.4"
+marshmallow = "^3.5.2"
+mongoengine = "^0.20.0"
+python = "^3.8"
+python-decouple = "^3.3"
+python-json-logger = "^0.1.11"
+prometheus_client = "^0.7.1"
+sanic = "~19.9.0"  # NOTE: bump after https://github.com/huge-success/sanic/issues/1749 is fixed
+sanic-openapi = "==0.6.0"  # NOTE: bump after the issue with the Swagger schema validator is fixed
+uvicorn = "^0.11.3"
+
+[tool.poetry.extras]
+aioredis = ["aioredis"]
+celery = ["celery", "croniter"]
+
+[tool.poetry.dev-dependencies]
+immuni-common-dev = { path = "dev", develop = true}
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

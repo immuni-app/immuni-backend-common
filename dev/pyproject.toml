@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "immuni-common-dev"
+version = "1.0.0"
+description = "dev-dependencies for immuni repositories"
+authors = []
+
+[tool.poetry.dependencies]
+aioredis = "^1.3.1"  # NOTE: needed to use a common redis check.
+bandit = "^1.6.2"
+black = "^19.10b0"
+flake8 = "==3.8.1"  # NOTE: 3.8.2 has issues with the exclude patterns.
+freezegun = "^0.3.15"
+isort = "^4.3.21"
+mongoengine = "^0.20.0"  # NOTE: needed to consolidate pylint config in common.
+mypy = "^0.770"
+pylint = "^2.5.0"
+pytest = "^5.4.1"
+pytest-cov = "^2.8.1"
+python = "^3.8"
+pylint-mongoengine = "^0.4.0"
+pytest-sanic = "^1.6.1"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
