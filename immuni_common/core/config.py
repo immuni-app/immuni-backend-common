@@ -30,7 +30,7 @@ ENV: Environment = config("ENV", cast=Environment.from_env_var, default=Environm
 API_HOST: str = config("API_HOST", default="0.0.0.0")
 API_PORT: int = config("API_PORT", default="5000", cast=int)
 
-CACHE_ENABLED: str = config("CACHE_ENABLED", cast=bool, default=True)
+CACHE_ENABLED: bool = config("CACHE_ENABLED", cast=bool, default=True)
 
 MAX_ISO_DATE_BACKWARD_DIFF: int = config("MAX_ISO_DATE_BACKWARD_DIFF", cast=int, default=180)
 MAX_ROLLING_PERIOD: int = config("MAX_ROLLING_PERIOD", cast=int, default=1000)
