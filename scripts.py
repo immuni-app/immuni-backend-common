@@ -13,8 +13,11 @@
 
 import argparse
 import logging
+import os
+import sys
 from pathlib import Path
 from subprocess import call
+from typing import Tuple
 
 logging.basicConfig(format="[%(asctime)s][%(levelname)s] %(message)s", level=logging.INFO)
 _LOGGER = logging.getLogger(__name__)
@@ -46,6 +49,9 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "service_dirname", help="The service directory name.", type=_validate_service_dirname
     )
+    parser.add_argument(
+        "--ci", help="Use the CI mode, by not applying changes.", action="store_true"
+    )
     return parser.parse_args()
 
 
@@ -57,40 +63,71 @@ def _get_immuni_common_pyproject_toml() -> str:
     return str(_get_immuni_common_root() / "pyproject.toml")
 
 
-def _get_isort_settings_path() -> str:
-    return str(_get_immuni_common_root())
+def _isort_command(is_ci: bool) -> Tuple[str, ...]:
+    command = (
+        "isort",
+        ".",
+        "--recursive",
+        "--atomic",
+        "--settings-path",
+        str(_get_immuni_common_root()),
+    )
+    return (*command, "--diff") if is_ci else command
 
 
-def _get_black_configuration() -> str:
-    return _get_immuni_common_pyproject_toml()
+def _black_command(is_ci: bool) -> Tuple[str, ...]:
+    command = ("black", ".", "--config", _get_immuni_common_pyproject_toml())
+    return (*command, "--check") if is_ci else command
 
 
-def _get_mypy_configuration() -> str:
-    return str(_get_immuni_common_root() / "mypy.ini")
+def _mypy_command() -> Tuple[str, ...]:
+    return "mypy", ".", "--config", str(_get_immuni_common_root() / "mypy.ini")
 
 
-def _get_flake8_configuration() -> str:
-    return str(_get_immuni_common_root() / ".flake8")
+def _flake8_command() -> Tuple[str, ...]:
+    return "flake8", ".", "--config", str(_get_immuni_common_root() / ".flake8")
 
 
-def _get_pylint_configuration() -> str:
-    return _get_immuni_common_pyproject_toml()
+def _bandit_command(service_dirname: str) -> Tuple[str, ...]:
+    return "bandit", "--recursive", service_dirname
+
+
+def _pylint_command(service_dirname: str, is_ci: bool) -> Tuple[str, ...]:
+    command = ("pylint", service_dirname, "--rcfile", _get_immuni_common_pyproject_toml())
+    # TODOs and FIXMEs should not mark the job as failed in CI, yet they should be visible while
+    # developing.
+    return (*command, "--disable=fixme") if is_ci else command
+
+
+def _run_command(command: Tuple[str, ...]) -> int:
+    _LOGGER.info(f"Running: {' '.join(command)}")
+    exit_code = call(command)
+    _LOGGER.info(f"Done: {command[0]} exit code is {exit_code}")
+    return exit_code
 
 
 def checks() -> None:
     """
     Run different linters and checks while keeping all configuration within the common repository.
+    NOTE: The commands run sequentially to avoid messing up the output in case multiple linters
+      produce warnings.
     """
     arguments = _parse_args()
+    any_failure = False
 
     commands = (
-        ("isort", ".", "--recursive", "--atomic", "--settings-path", _get_isort_settings_path()),
-        ("black", ".", "--config", _get_black_configuration()),
-        ("mypy", ".", "--config", _get_mypy_configuration()),
-        ("flake8", ".", "--config", _get_flake8_configuration()),
-        ("bandit", "--recursive", arguments.service_dirname),
-        ("pylint", arguments.service_dirname, "--rcfile", _get_pylint_configuration()),
+        _isort_command(arguments.ci),
+        _black_command(arguments.ci),
+        _mypy_command(),
+        _flake8_command(),
+        _bandit_command(arguments.service_dirname),
+        _pylint_command(arguments.service_dirname, arguments.ci),
     )
+
     for command in commands:
-        logging.info(f"Running: {' '.join(command)}")
-        call(command)
+        exit_code = _run_command(command)
+        any_failure = any_failure or exit_code != os.EX_OK
+
+    if any_failure:
+        _LOGGER.error("At least one check failed. Please fix them before proceeding.")
+        sys.exit(os.EX_SOFTWARE)

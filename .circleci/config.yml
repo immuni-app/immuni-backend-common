@@ -1,0 +1,145 @@
+# Immuni CircleCI configuration.
+# Copyright (C) 2020 Presidenza del Consiglio dei Ministri.
+# Please refer to the AUTHORS file for more information.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+version: 2.1
+description: Maintain consistent security and quality standards.
+
+# TODO: Evaluate promotion to orbs.
+commands:
+  poetry-install:
+    description: |
+      Install Poetry and the Python dependencies from the poetry.lock with Poetry.
+      The virtualenv containing the installed packages will automatically be cached and restored.
+    parameters:
+      additional_parameters:
+        description: Additional parameters to append to the poetry install command (e.g., --extras)
+        type: string
+        default: ""
+
+      deps_cache_version:
+        description: Dependencies cache version identifier. Bump this to clear the virtualenv cache.
+        type: string
+        default: "v1"
+
+      poetry_sha:
+        description: The sha associated with a specific poetry release.
+        type: string
+        default: 754dbf80dc022b89974288cff10b40ab2f1c2697
+
+    steps:
+      - run:
+          name: "[python] Setup Poetry environment"
+          command: echo 'export POETRY_HOME=./.poetry; export PATH=$POETRY_HOME/bin:$PATH' >> $BASH_ENV
+      - restore_cache:
+          name: "[python] Restore the Poetry cache"
+          keys:
+            - poetry-<< parameters.poetry_sha >>
+      - run:
+          name: "[python] Install Poetry"
+          working_directory: .
+          command: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/<< parameters.poetry_sha >>/get-poetry.py | python
+      - save_cache:
+          name: "[python] Save the Poetry cache"
+          key: poetry-<< parameters.poetry_sha >>
+          paths:
+            - ./.poetry
+      - restore_cache:
+          name: "[python] Restore the dependencies cache"
+          keys:
+            - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "./poetry.lock" }}
+            - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}
+            - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}
+      - run:
+          name: "[python] Install the dependencies"
+          working_directory: .
+          environment:
+            POETRY_VIRTUALENVS_IN_PROJECT: true
+          command: poetry install -v << parameters.additional_parameters >>
+      - save_cache:
+          name: "[python] Save the dependencies cache"
+          key: venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "./poetry.lock" }}
+          paths:
+            - .venv
+      - run:
+          name: "[python] Activate the virtual environment"
+          command: echo 'source .venv/bin/activate' >> $BASH_ENV
+
+  pytest:
+    description: |
+      Run pytest with code coverage.
+      Store the coverage reports as artifacts.
+      Fail if the code coverage is below the minimum threshold.
+    parameters:
+      coverage_path:
+        description: Filesystem path to measure coverage.
+        type: string
+        default: .
+
+      min_coverage:
+        description: Minimum code coverage percentage ([0,100]).
+        type: integer
+        default: 100
+
+    steps:
+      - run:
+          name: "[python] Run pytest with code coverage"
+          command: |
+            pytest \
+              --capture=no \
+              --cov-branch \
+              --cov-fail-under=<<parameters.min_coverage>> \
+              --cov-report=html:coverage-reports \
+              --cov=<<parameters.coverage_path>> \
+              --junitxml=coverage-reports/junit.xml \
+      - store_test_results:
+          path: test-reports
+      - store_artifacts:
+          path: test-reports
+      - store_artifacts:
+          path: coverage-reports
+
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.8.2
+      - image: circleci/mongo:4.0.18-xenial
+      - image: circleci/redis:5.0.9-alpine3.11
+    resource_class: small
+    steps:
+      - checkout
+      - poetry-install:
+          additional_parameters: --extras aioredis --extras celery
+          deps_cache_version: "v2"
+      - pytest:
+          coverage_path: ./immuni_common
+          min_coverage: 80
+
+  check:
+    docker:
+      - image: cimg/python:3.8.2
+    resource_class: small
+    steps:
+      - checkout
+      - poetry-install:
+          additional_parameters: --extras aioredis --extras celery
+          deps_cache_version: "v2"
+      - run:
+          name: "[python] Run checks"
+          command: poetry run checks immuni_common --ci
+
+workflows:
+  code-quality:
+    jobs:
+      - test
+      - check
