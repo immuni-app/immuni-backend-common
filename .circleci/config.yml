@@ -32,6 +32,11 @@ commands:
         type: string
         default: "v1"
 
+      poetry_sha:
+        description: The sha associated with a specific poetry release.
+        type: string
+        default: 754dbf80dc022b89974288cff10b40ab2f1c2697
+
     steps:
       - run:
           name: "[python] Setup Poetry environment"
@@ -39,14 +44,14 @@ commands:
       - restore_cache:
           name: "[python] Restore the Poetry cache"
           keys:
-            - poetry-754dbf80dc022b89974288cff10b40ab2f1c2697
+            - poetry-<< parameters.poetry_sha >>
       - run:
           name: "[python] Install Poetry"
           working_directory: .
-          command: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/754dbf80dc022b89974288cff10b40ab2f1c2697/get-poetry.py | python
+          command: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/<< parameters.poetry_sha >>/get-poetry.py | python
       - save_cache:
           name: "[python] Save the Poetry cache"
-          key: poetry-754dbf80dc022b89974288cff10b40ab2f1c2697
+          key: poetry-<< parameters.poetry_sha >>
           paths:
             - ./.poetry
       - restore_cache:
