@@ -64,7 +64,9 @@ When a new pull request is opened, the CI checks for security, formatting, or li
 To preserve functionality after every change, please ensure that all existing test cases pass. You may be required to implement additional test cases, in the event that the existing ones do not ensure maximum coverage after your changes.
 
 ```bash
-poetry run pytest
+poetry run pytest  \
+    --cov=immuni_common \
+    --cov-fail-under=80
 ```
 
 When a new pull request is opened, the CI assesses whether all test cases pass and whether the maximum coverage is reached. Please solve any failures before we can proceed with the review.
