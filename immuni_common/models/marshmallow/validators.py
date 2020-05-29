@@ -218,6 +218,9 @@ class TekListValidator(Validator):
         #   here is done on purpose to make things simpler in case of changes in validation.
         #   We would like to keep field validation more flexible as not to spread strict validation
         #   logic in many places.
+        if len(value) == 0:
+            return
+
         if any(tek.rolling_period != 144 for tek in value):
             raise ValidationError("Some rolling values are not 144.")
 
