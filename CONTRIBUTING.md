@@ -33,7 +33,7 @@ This section describes the project's architecture. Please read it thoroughly bef
 The project has been implemented in [Python 3.8](https://www.python.org/). [Poetry](https://python-poetry.org/) is used for dependency management, allowing for a seamless installation of dependencies.
 
 ```bash
-poetry install --extras aioredis --extras celery --extras mongoengine
+poetry install --extras aioredis --extras celery 
 ```
 
 ## Repository Structure
