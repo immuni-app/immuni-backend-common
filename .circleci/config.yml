@@ -115,6 +115,7 @@ jobs:
       - checkout
       - poetry-install:
           additional_parameters: --extras aioredis --extras celery
+          deps_cache_version: "v2"
       - pytest:
           coverage_path: ./immuni_common
           min_coverage: 80
@@ -127,6 +128,7 @@ jobs:
       - checkout
       - poetry-install:
           additional_parameters: --extras aioredis --extras celery
+          deps_cache_version: "v2"
       - run:
           name: "[python] Run checks"
           command: poetry run checks immuni_common --ci
