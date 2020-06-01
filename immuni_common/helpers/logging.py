@@ -45,7 +45,7 @@ class RedactingJsonFormatter(jsonlogger.JsonFormatter):
 
     _RESERVED_ATTRS = {
         "host",  # the sanic request IP.
-        "scope",  # the gunicorn field containing client IP.
+        "scope",  # the uvicorn field containing client IP.
     }
 
     _REDACT_PATTERNS = [
@@ -124,22 +124,35 @@ def initialize_logging(log_level: LogLevel, log_json_indent: int) -> None:
 def get_sanic_logger_config(log_json_indent: int) -> Dict[str, Any]:
     """
     Return the Sanic logger configuration.
+    It starts off from the Sanic's default configuration, overriding the formatters, removing
+    sensible fields (i.e., host).
     # NOTE: This is needed when running Sanic standalone. Gunicorn does not use Sanic loggers.
 
     :param log_json_indent: the log json indentation.
     :return: the Sanic logger configuration.
     """
     logging_config = {**LOGGING_CONFIG_DEFAULTS}
-    formatters = logging_config["formatters"]
-    for formatter_name in formatters:
-        custom_formatter = f"{RedactingJsonFormatter.__module__}.{RedactingJsonFormatter.__name__}"
-        if formatters[formatter_name].get("()") != custom_formatter:
-            attrs = set(re.findall(r"(%\(\w+\)[s,d])", formatters[formatter_name]["format"]))
-            formatters[formatter_name] = {
-                "()": custom_formatter,
-                "json_indent": log_json_indent,
-                "logging_attrs": attrs,
-            }
+    custom_formatter = f"{RedactingJsonFormatter.__module__}.{RedactingJsonFormatter.__name__}"
+    logging_config["formatters"] = {
+        "generic": {
+            "()": custom_formatter,
+            "json_indent": log_json_indent,
+            "logging_attrs": ("%(asctime)s", "%(process)d", "%(levelname)s", "%(message)s"),
+        },
+        "access": {
+            "()": custom_formatter,
+            "json_indent": log_json_indent,
+            "logging_attrs": (
+                "%(asctime)s",
+                "%(name)s",
+                "%(levelname)s",
+                "%(request)s",
+                "%(message)s",
+                "%(status)d",
+                "%(byte)d",
+            ),
+        },
+    }
     return logging_config
 
 
