@@ -47,8 +47,12 @@ async def test_health_check(client: TestClient) -> None:
 async def test_ips_are_not_logged(client: TestClient, capfd: Any) -> None:
     response = await client.get("/")
     assert response.status == HTTPStatus.OK
-    out, _ = capfd.readouterr()
-    assert json.loads(out)["host"].startswith("***:")
+    out = capfd.readouterr()[0]
+    lines = [json.loads(line) for line in out.splitlines()]
+    assert any("request" in line for line in lines)
+    for line in lines:
+        if "request" in line:
+            assert line["request"].startswith("GET http://***:")
 
 
 @mark.skip(reason="Passes alone, fails when ran together with the rest")  # FIXME

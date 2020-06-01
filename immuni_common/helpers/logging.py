@@ -44,7 +44,6 @@ class RedactingJsonFormatter(jsonlogger.JsonFormatter):
     }
 
     _RESERVED_ATTRS = {
-        *RESERVED_ATTRS,
         "host",  # the sanic request IP.
         "scope",  # the gunicorn field containing client IP.
     }
@@ -62,9 +61,17 @@ class RedactingJsonFormatter(jsonlogger.JsonFormatter):
         """
         super().__init__(
             fmt=" ".join(
-                sorted(self._LOGGING_ATTRS.union(logging_attrs or set()) - self._RESERVED_ATTRS)
+                sorted(
+                    self._LOGGING_ATTRS.union(
+                        set(
+                            attr
+                            for attr in logging_attrs or set()
+                            if all(reserved not in attr for reserved in self._RESERVED_ATTRS)
+                        )
+                    )
+                )
             ),
-            reserved_attrs=self._RESERVED_ATTRS,
+            reserved_attrs={*RESERVED_ATTRS, *self._RESERVED_ATTRS},
             json_indent=json_indent if json_indent else None,
         )
 
