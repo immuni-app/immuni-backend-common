@@ -12,37 +12,136 @@
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import logging
+import re
 import sys
+from typing import Any, Dict, Optional, Set
 
+from gunicorn import glogging
 from pythonjsonlogger import jsonlogger
+from pythonjsonlogger.jsonlogger import RESERVED_ATTRS
+from sanic.log import LOGGING_CONFIG_DEFAULTS
 
 from immuni_common.models.enums import LogLevel
 
 
-def initialize_logging(log_level: LogLevel) -> None:
+class RedactingJsonFormatter(jsonlogger.JsonFormatter):
+    """
+    Custom logging Json formatter, in charge of redacting sensitive information too.
+    """
+
+    _LOGGING_ATTRS = {
+        "%(asctime)s",
+        "%(name)s",
+        "%(pathname)s",
+        "%(funcName)s",
+        "%(lineno)d",
+        "%(process)d",
+        "%(processName)s",
+        "%(thread)d",
+        "%(threadName)s",
+        "%(levelname)s ",
+        "%(message)s",
+    }
+
+    _RESERVED_ATTRS = {
+        *RESERVED_ATTRS,
+        "host",  # the sanic request IP.
+        "scope",  # the gunicorn field containing client IP.
+    }
+
+    _REDACT_PATTERNS = [
+        r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}",  # Any IP (simple regex, allows numbers > 255 too).
+    ]
+
+    def __init__(
+        self, json_indent: Optional[int], logging_attrs: Optional[Set[str]] = None
+    ) -> None:
+        """
+        :param json_indent: the log json indentation.
+        :param logging_attrs: the attributes to log, in addition to the default ones.
+        """
+        super().__init__(
+            fmt=" ".join(
+                sorted(self._LOGGING_ATTRS.union(logging_attrs or set()) - self._RESERVED_ATTRS)
+            ),
+            reserved_attrs=self._RESERVED_ATTRS,
+            json_indent=json_indent if json_indent else None,
+        )
+
+    def format(self, record: logging.LogRecord) -> str:
+        """
+        Format and redact the log record.
+
+        :param record: the log record to format and redact.
+        :return: the formatted and redacted log record, as string.
+        """
+        message = super().format(record)
+        for pattern in self._REDACT_PATTERNS:
+            message = re.sub(pattern, "***", message)
+        return message
+
+
+class CustomGunicornLogger(glogging.Logger):
+    """
+    Custom logger for Gunicorn log messages.
+
+    Gunicorn should be instructed to use this logger through its specific command line option:
+        --logger-class=immuni_common.helpers.logging.CustomGunicornLogger
+    """
+
+    def setup(self, cfg: Any) -> None:
+        """
+        Configure Gunicorn application logging configuration.
+        """
+        super().setup(cfg)
+        self._set_handler(self.error_log, cfg.errorlog, RedactingJsonFormatter(json_indent=None))
+        self._set_handler(self.access_log, cfg.accesslog, RedactingJsonFormatter(json_indent=None))
+
+
+def initialize_logging(log_level: LogLevel, log_json_indent: int) -> None:
     """
     Initialize logging and set proper default levels and formatters.
 
     :param log_level: the log level to set.
+    :param log_json_indent: the log json indentation.
     """
     root_logger = logging.getLogger()
     root_logger.setLevel(log_level.name)
 
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(log_level.name)
-    formatter = jsonlogger.JsonFormatter(
-        "%(asctime)s "
-        "%(name)s "
-        "%(pathname)s "
-        "%(funcName)s "
-        "%(lineno)d "
-        "%(process)d "
-        "%(processName)s "
-        "%(thread)d "
-        "%(threadName)s "
-        "%(levelname)s  "
-        "%(message)s",
-        json_indent=2,
-    )
-    handler.setFormatter(formatter)
+    handler.setFormatter(RedactingJsonFormatter(json_indent=log_json_indent))
     root_logger.addHandler(handler)
+
+
+def get_sanic_logger_config(log_json_indent: int) -> Dict[str, Any]:
+    """
+    Return the Sanic logger configuration.
+    # NOTE: This is needed when running Sanic standalone. Gunicorn does not use Sanic loggers.
+
+    :param log_json_indent: the log json indentation.
+    :return: the Sanic logger configuration.
+    """
+    logging_config = {**LOGGING_CONFIG_DEFAULTS}
+    formatters = logging_config["formatters"]
+    for formatter_name in formatters:
+        custom_formatter = f"{RedactingJsonFormatter.__module__}.{RedactingJsonFormatter.__name__}"
+        if formatters[formatter_name].get("()") != custom_formatter:
+            attrs = set(re.findall(r"(%\(\w+\)[s,d])", formatters[formatter_name]["format"]))
+            formatters[formatter_name] = {
+                "()": custom_formatter,
+                "json_indent": log_json_indent,
+                "logging_attrs": attrs,
+            }
+    return logging_config
+
+
+def setup_celery_logger(logger: logging.Logger, log_json_indent: int) -> None:
+    """
+    Change the Celery logger formatters to use the custom one.
+
+    :param logger: the Celery logger.
+    :param log_json_indent: the log json indentation.
+    """
+    for handler in logger.handlers:
+        handler.setFormatter(RedactingJsonFormatter(json_indent=log_json_indent))
