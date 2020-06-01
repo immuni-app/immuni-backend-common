@@ -17,7 +17,8 @@ from immuni_common.helpers.logging import initialize_logging
 from immuni_common.models.enums import Environment, LogLevel
 
 LOG_LEVEL: LogLevel = config("LOGLEVEL", cast=LogLevel.from_env_var, default=LogLevel.INFO)
-initialize_logging(LOG_LEVEL)
+LOG_JSON_INDENT: int = config("LOG_JSON_INDENT", cast=int, default=0)
+initialize_logging(LOG_LEVEL, LOG_JSON_INDENT)
 
 # The following are supposed to be filled at Docker build time.
 GIT_BRANCH: str = config("GIT_BRANCH", default="no-release")
