@@ -69,19 +69,14 @@ class BatchFile(Document):
         return last_batch.period_end, last_batch.index
 
     @classmethod
-    def delete_older_than(cls, datetime_: datetime) -> None:
+    def delete_older_than(cls, datetime_: datetime) -> int:
         """
         Delete all batches older than the given datetime.
 
         :param datetime_: the datetime before which the batches are to be deleted.
+        :return: the number of batches that were deleted.
         """
-        objects = cls.objects.filter(id__lte=ObjectId.from_datetime(datetime_))
-        count = objects.count()
-        objects.delete()
-        _LOGGER.info(
-            "BatchFile documents deletion completed.",
-            extra=dict(n_deleted=count, created_before=datetime_.isoformat()),
-        )
+        return cls.objects.filter(id__lte=ObjectId.from_datetime(datetime_)).delete()
 
     @staticmethod
     def _get_oldest_and_newest_indexes_pipeline(days: int) -> List[Dict]:
