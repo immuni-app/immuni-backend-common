@@ -66,6 +66,7 @@ To preserve functionality after every change, please ensure that all existing te
 ```bash
 poetry run pytest  \
     --cov=immuni_common \
+    --cov-branch \
     --cov-fail-under=80
 ```
 
