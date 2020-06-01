@@ -44,6 +44,13 @@ async def test_health_check(client: TestClient) -> None:
     assert response.status == HTTPStatus.OK
 
 
+async def test_ips_are_not_logged(client: TestClient, capfd: Any) -> None:
+    response = await client.get("/")
+    assert response.status == HTTPStatus.OK
+    out, _ = capfd.readouterr()
+    assert json.loads(out)["host"].startswith("***:")
+
+
 @mark.skip(reason="Passes alone, fails when ran together with the rest")  # FIXME
 async def test_metrics_at_start(client: TestClient) -> None:
     response = await client.get("/metrics")
