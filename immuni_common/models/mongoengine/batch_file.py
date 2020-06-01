@@ -74,7 +74,7 @@ class BatchFile(Document):
         Delete all batches older than the given datetime.
 
         :param datetime_: the datetime before which the batches are to be deleted.
-        :return: The number of batches that were deleted.
+        :return: the number of batches that were deleted.
         """
         return cls.objects.filter(id__lte=ObjectId.from_datetime(datetime_)).delete()
 
