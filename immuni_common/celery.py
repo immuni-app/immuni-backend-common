@@ -13,13 +13,17 @@
 
 from dataclasses import dataclass
 from datetime import timedelta
+from logging import Logger
 from types import ModuleType
 from typing import Any, Callable, Dict, ItemsView, Iterable, Optional, Union
 
 from celery import Celery
 from celery.schedules import crontab
+from celery.signals import after_setup_logger
 from celery.task import Task
 
+from immuni_common.core import config
+from immuni_common.helpers.logging import setup_celery_logger
 from immuni_common.helpers.utils import dense_dict, modules_in_package
 
 
@@ -125,3 +129,15 @@ class CeleryApp(Celery):
         return super().gen_task_name(
             name, module[len(f"{self.__service_dir_name__}.tasks.") :]  # noqa
         )
+
+
+@after_setup_logger.connect
+def setup_loggers(logger: Logger, *args: Any, **kwargs: Any) -> None:
+    """
+    Callback to execute after the original Celery logger is set.
+
+    :param logger: the Celery logger.
+    :param args: the additional positional arguments, ignored here.
+    :param kwargs: the additional keyword arguments, ignored here.
+    """
+    setup_celery_logger(logger, config.LOG_JSON_INDENT)

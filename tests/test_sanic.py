@@ -44,6 +44,17 @@ async def test_health_check(client: TestClient) -> None:
     assert response.status == HTTPStatus.OK
 
 
+async def test_ips_are_not_logged(client: TestClient, capfd: Any) -> None:
+    response = await client.get("/")
+    assert response.status == HTTPStatus.OK
+    out = capfd.readouterr()[0]
+    lines = [json.loads(line) for line in out.splitlines()]
+    assert any("request" in line for line in lines)
+    for line in lines:
+        if "request" in line:
+            assert line["request"].startswith("GET http://***:")
+
+
 @mark.skip(reason="Passes alone, fails when ran together with the rest")  # FIXME
 async def test_metrics_at_start(client: TestClient) -> None:
     response = await client.get("/metrics")
@@ -264,10 +275,10 @@ def test_serializer_supports_defined_types(value: Any, expected: Any) -> None:
 
 
 def test_serializer_does_not_support_undefined_types() -> None:
-    class NonSerilisable(Enum):
+    class NonSerializable(Enum):
         A = auto()
         B = auto()
 
     with raises(TypeError) as exception:
-        json.dumps(NonSerilisable.A, cls=CustomJSONEncoder)
+        json.dumps(NonSerializable.A, cls=CustomJSONEncoder)
         assert "is not JSON serializable" in str(exception)
