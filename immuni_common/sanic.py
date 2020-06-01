@@ -27,6 +27,7 @@ from sanic_openapi import doc, swagger_blueprint
 from immuni_common.core import config
 from immuni_common.core.exceptions import ApiException
 from immuni_common.core.managers import BaseManagers
+from immuni_common.helpers.logging import get_sanic_logger_config
 from immuni_common.helpers.sanic import json_response
 from immuni_common.models.enums import Environment
 from immuni_common.monitoring.core import initialize_monitoring
@@ -48,7 +49,7 @@ def create_app(
     :param managers: the microservice's managers.
     :return: the created Sanic application.
     """
-    app = Sanic(__name__)
+    app = Sanic(__name__, log_config=get_sanic_logger_config(config.LOG_JSON_INDENT))
     app.config.TESTING = config.ENV == Environment.TESTING
 
     swagger_config = dict(
