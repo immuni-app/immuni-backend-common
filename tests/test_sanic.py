@@ -264,10 +264,10 @@ def test_serializer_supports_defined_types(value: Any, expected: Any) -> None:
 
 
 def test_serializer_does_not_support_undefined_types() -> None:
-    class NonSerilisable(Enum):
+    class NonSerializable(Enum):
         A = auto()
         B = auto()
 
     with raises(TypeError) as exception:
-        json.dumps(NonSerilisable.A, cls=CustomJSONEncoder)
+        json.dumps(NonSerializable.A, cls=CustomJSONEncoder)
         assert "is not JSON serializable" in str(exception)
