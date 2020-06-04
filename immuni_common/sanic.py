@@ -128,7 +128,11 @@ def create_app(
 
     for blueprint in blueprints:
         app.blueprint(blueprint)
-    app.blueprint(swagger_blueprint)
+
+    if config.ENV != Environment.RELEASE:
+        # Swagger has some known vulnerabilities, so it's a good practice to avoid
+        # keeping the swagger endpoints open in a production environment.
+        app.blueprint(swagger_blueprint)
 
     return app
 
