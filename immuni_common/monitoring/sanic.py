@@ -51,7 +51,7 @@ def sanic_after_request_handler(request: Request, response: HTTPResponse) -> Non
     """
     latency = monotonic() - request[_START_TIME]
     labels = (
-        request.path,
+        request.uri_template,
         request.method,
         # NOTE: Some handlers can ignore response logic (e.g., websocket handler)
         response.status if response else 200,
