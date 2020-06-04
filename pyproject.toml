@@ -48,19 +48,19 @@ description = ""
 authors = []
 
 [tool.poetry.dependencies]
-aioredis = { version = "^1.3.1", optional = true }
-celery = {version = "^4.4.2", extras = ["redis"], optional = true }
-croniter = {version = "^0.3.31", optional = true}
-gunicorn = "^20.0.4"
-marshmallow = "^3.5.2"
-mongoengine = "^0.20.0"
+aioredis = { version = "==1.3.1", optional = true }
+celery = {version = "==4.4.2", extras = ["redis"], optional = true }
+croniter = {version = "==0.3.31", optional = true}
+gunicorn = "==20.0.4"
+marshmallow = "==3.5.2"
+mongoengine = "==0.20.0"
 python = "^3.8"
-python-decouple = "^3.3"
-python-json-logger = "^0.1.11"
-prometheus_client = "^0.7.1"
-sanic = "~19.9.0"  # NOTE: bump after https://github.com/huge-success/sanic/issues/1749 is fixed
+python-decouple = "==3.3"
+python-json-logger = "==0.1.11"
+prometheus_client = "==0.7.1"
+sanic = "==19.9.0"  # NOTE: bump after https://github.com/huge-success/sanic/issues/1749 is fixed
 sanic-openapi = "==0.6.0"  # NOTE: bump after the issue with the Swagger schema validator is fixed
-uvicorn = "^0.11.3"
+uvicorn = "==0.11.3"
 
 [tool.poetry.extras]
 aioredis = ["aioredis"]
