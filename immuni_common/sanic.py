@@ -67,9 +67,9 @@ def create_app(
 
     @app.route("/")
     @doc.summary("Health check.")
-    @doc.response(HTTPStatus.NO_CONTENT.value, "Ok", description="The server is running ok.")
+    @doc.response(HTTPStatus.OK.value, "Ok", description="The server is running ok.")
     async def health_check(request: Request) -> HTTPResponse:
-        return HTTPResponse(status=HTTPStatus.OK)
+        return HTTPResponse(status=HTTPStatus.OK.value)
 
     # TODO: Evaluate whether to expose it over another port.
     @app.route("/metrics")
