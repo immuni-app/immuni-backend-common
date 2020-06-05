@@ -3,6 +3,7 @@ FROM python:3.8-buster AS build
 WORKDIR /app
 ENV VIRTUAL_ENV /app/.venv
 ENV POETRY_HOME /app/.poetry
+ENV POETRY_VERSION 1.0.5
 ENV PATH $POETRY_HOME/bin:$VIRTUAL_ENV/bin:$PATH
 # Prometheus requires this envar name for multiprocess, and it has to be an absolute path.
 ENV prometheus_multiproc_dir /app/.prometheus/multiproc
@@ -16,8 +17,7 @@ RUN mkdir -p $prometheus_multiproc_dir \
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 
-# Pinned to poetry:1.0.5.
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/754dbf80dc022b89974288cff10b40ab2f1c2697/get-poetry.py | python \
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/${POETRY_VERSION}/get-poetry.py | python \
     && poetry config virtualenvs.in-project true
 
 COPY poetry.lock pyproject.toml ./
