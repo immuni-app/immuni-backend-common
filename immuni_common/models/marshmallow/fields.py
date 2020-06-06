@@ -135,4 +135,4 @@ class RiskScore(Integer):
     """
 
     def __init__(self) -> None:
-        super().__init__(required=True, validate=Range(min=0, max=4096))
+        super().__init__(required=True, validate=Range(min=0, max=sys.maxsize))

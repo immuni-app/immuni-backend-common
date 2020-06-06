@@ -80,8 +80,8 @@ class ExposureInfoSchema(Schema):
     """
 
     date = IsoDate()
-    duration = fields.Integer(required=True, validate=Range(min=0, max=1800))
-    attenuation_value = fields.Integer(required=True, validate=Range(min=0, max=255))
+    duration = fields.Integer(required=True, validate=Range(min=0, max=sys.maxsize))
+    attenuation_value = fields.Integer(required=True, validate=Range(min=0, max=sys.maxsize))
     attenuation_durations = AttenuationDurations()
     transmission_risk_level = EnumField(TransmissionRiskLevel)
     total_risk_score = RiskScore()
@@ -106,8 +106,8 @@ class ExposureDetectionSummarySchema(Schema):
     """
 
     date = IsoDate()
-    matched_key_count = fields.Integer(required=True, validate=Range(min=1, max=sys.maxsize))
-    days_since_last_exposure = fields.Integer(required=True, validate=Range(min=0, max=14))
+    matched_key_count = fields.Integer(required=True, validate=Range(min=0, max=sys.maxsize))
+    days_since_last_exposure = fields.Integer(required=True, validate=Range(min=0, max=sys.maxsize))
     attenuation_durations = AttenuationDurations()
     maximum_risk_score = RiskScore()
     exposure_info = fields.Nested(ExposureInfoSchema, many=True)
