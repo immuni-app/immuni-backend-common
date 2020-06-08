@@ -29,10 +29,7 @@ from immuni_common.models.marshmallow.fields import (
     Province,
 )
 from immuni_common.models.marshmallow.schemas import OtpDataSchema
-from immuni_common.models.marshmallow.validators import (
-    IsoDateValidator,
-    OtpCodeValidator,
-)
+from immuni_common.models.marshmallow.validators import IsoDateValidator, OtpCodeValidator
 
 _OTP_DATA_SERIALIZED = {"symptoms_started_on": date.today().isoformat()}
 
