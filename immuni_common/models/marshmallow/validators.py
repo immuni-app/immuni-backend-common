@@ -14,13 +14,12 @@
 import base64
 import binascii
 from datetime import date, timedelta
-from typing import Iterable, List, Optional
+from typing import Iterable, Optional
 
 from marshmallow import ValidationError
 from marshmallow.validate import Validator
 
 from immuni_common.core import config
-from immuni_common.models.mongoengine.temporary_exposure_key import TemporaryExposureKey
 
 
 class Base64StringValidator(Validator):
