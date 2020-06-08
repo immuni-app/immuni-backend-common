@@ -29,11 +29,7 @@ from immuni_common.models.marshmallow.fields import (
     Province,
 )
 from immuni_common.models.marshmallow.schemas import OtpDataSchema
-from immuni_common.models.marshmallow.validators import (
-    IsoDateValidator,
-    OtpCodeValidator,
-    TekListValidator,
-)
+from immuni_common.models.marshmallow.validators import IsoDateValidator, OtpCodeValidator
 
 _OTP_DATA_SERIALIZED = {"symptoms_started_on": date.today().isoformat()}
 
@@ -240,7 +236,3 @@ def test_integerbool_field(value: int) -> None:
 def test_integerbool_field_raises(value: Any) -> None:
     with raises(ValidationError):
         IntegerBoolField()._deserialize(value, None, None)
-
-
-def test_tek_key_validator_pass_if_empty() -> None:
-    TekListValidator().__call__([])
