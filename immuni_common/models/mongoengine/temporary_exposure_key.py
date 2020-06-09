@@ -50,9 +50,9 @@ class TemporaryExposureKey(EmbeddedDocument, Serializable):
     @property
     def expires_at(self) -> datetime:
         """
-        Returns the datetime when the current key will expire
-         (when it stops being used by the client to generate RPIs)
-        :return:
+        The datetime when the current key stops being used by the client to generate RPIs.
+
+        :return: the datetime the current key expires.
         """
         return self.created_at + timedelta(minutes=10 * self.rolling_period)
 
