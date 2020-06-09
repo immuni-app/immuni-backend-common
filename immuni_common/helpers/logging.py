@@ -125,13 +125,16 @@ def get_sanic_logger_config(log_json_indent: int) -> Dict[str, Any]:
     """
     Return the Sanic logger configuration.
     It starts off from the Sanic's default configuration, overriding the formatters, removing
-    sensible fields (i.e., host).
+    sensible fields (i.e., host), and disabling the propagation which would cause duplicate logs
+    due to the added handler to the root_logger.
     # NOTE: This is needed when running Sanic standalone. Gunicorn does not use Sanic loggers.
 
     :param log_json_indent: the log json indentation.
     :return: the Sanic logger configuration.
     """
     logging_config = {**LOGGING_CONFIG_DEFAULTS}
+    logging_config["loggers"]["sanic.error"]["propagate"] = False
+    logging_config["loggers"]["sanic.access"]["propagate"] = False
     custom_formatter = f"{RedactingJsonFormatter.__module__}.{RedactingJsonFormatter.__name__}"
     logging_config["formatters"] = {
         "generic": {
