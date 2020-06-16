@@ -21,10 +21,21 @@ from celery import Celery
 from celery.schedules import crontab
 from celery.signals import after_setup_logger
 from celery.task import Task
+from croniter import croniter
 
 from immuni_common.core import config
 from immuni_common.helpers.logging import setup_celery_logger
 from immuni_common.helpers.utils import dense_dict, modules_in_package
+
+
+def string_to_crontab(crontab_string: str) -> crontab:
+    """
+    Parse a crontab string into a crontab object.
+
+    :param crontab_string: the crontab string to parse.
+    :return: the parsed crontab object.
+    """
+    return crontab(*[",".join(map(str, x)) for x in croniter(crontab_string).expanded])
 
 
 @dataclass(frozen=True)
