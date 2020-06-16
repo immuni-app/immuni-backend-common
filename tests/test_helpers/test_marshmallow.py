@@ -78,6 +78,22 @@ def test_base64_string_failure_on_init() -> None:
         Base64String(validate=lambda value: print("dummy"))
 
 
+def test_base64_string_max_length() -> None:
+    with raises(ValidationError):
+        Base64String(max_encoded_length=5).validate("123456")  # type:ignore
+
+
+def test_base64_string_min_length() -> None:
+    with raises(ValidationError):
+        Base64String(min_encoded_length=5).validate("1234")  # type:ignore
+
+
+@mark.parametrize("value", ["YWJj", "YWE="])
+def test_base64_string_length(value: str) -> None:
+    with raises(ValidationError):
+        Base64String(min_encoded_length=1, max_encoded_length=5).validate("123456")  # type:ignore
+
+
 @mark.parametrize(
     "otp",
     (

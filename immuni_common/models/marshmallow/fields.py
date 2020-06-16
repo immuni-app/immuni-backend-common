@@ -44,17 +44,35 @@ class Base64String(String):
     Validate a base64-encoded string.
     """
 
-    def __init__(self, *args: Any, length: Optional[int] = None, **kwargs: Any) -> None:
+    def __init__(
+        self,
+        *args: Any,
+        length: Optional[int] = None,
+        min_encoded_length: Optional[int] = None,
+        max_encoded_length: Optional[int] = None,
+        **kwargs: Any,
+    ) -> None:
         """
         :param args: the positional arguments of the String field.
         :param length: the length, if any, the string shall have to be considered valid.
+        :param min_encoded_length: the minimum length, if any, the encoded string shall have
+         to be considered valid.
+        :param max_encoded_length: the maximum length, if any, the encoded string shall have
+         to be considered valid.
         :param kwargs: the keyword arguments of the String field.
         :raises: ValueError if the keyword arguments specify the "validate" keyword.
         """
         if "validate" in kwargs:
             raise ValueError(f"{Base64String.__name__} does not accept validate.")
+
         super().__init__(
-            *args, **kwargs, validate=Base64StringValidator(length=length)
+            *args,
+            **kwargs,
+            validate=Base64StringValidator(
+                length=length,
+                min_encoded_length=min_encoded_length,
+                max_encoded_length=max_encoded_length,
+            ),
         )  # type: ignore
 
 
