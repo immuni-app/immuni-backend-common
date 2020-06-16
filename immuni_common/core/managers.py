@@ -10,6 +10,7 @@
 #  GNU Affero General Public License for more details.
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+from typing import Any
 
 
 class BaseManagers:
@@ -20,14 +21,18 @@ class BaseManagers:
     implement them all.
     """
 
-    async def initialize(self) -> None:
+    async def initialize(self, **kwargs: Any) -> None:
         """
         Initialize managers on demand.
         To be overridden by subclasses, if needed.
+
+        :param kwargs: the additional keyword arguments the subclasses may need.
         """
 
-    async def teardown(self) -> None:
+    async def teardown(self, **kwargs: Any) -> None:
         """
         Perform teardown actions (e.g., close open connections).
         To be overridden by subclasses, if needed.
+
+        :param kwargs: the additional keyword arguments the subclasses may need.
         """
