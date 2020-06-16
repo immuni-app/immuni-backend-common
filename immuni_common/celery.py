@@ -10,7 +10,6 @@
 #  GNU Affero General Public License for more details.
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 from dataclasses import dataclass
 from datetime import timedelta
 from logging import Logger
@@ -22,10 +21,12 @@ from celery.schedules import crontab
 from celery.signals import after_setup_logger
 from celery.task import Task
 from croniter import croniter
+from prometheus_client.exposition import start_http_server
 
 from immuni_common.core import config
 from immuni_common.helpers.logging import setup_celery_logger
 from immuni_common.helpers.utils import dense_dict, modules_in_package
+from immuni_common.monitoring.core import initialize_monitoring
 
 
 def string_to_crontab(crontab_string: str) -> crontab:
@@ -128,6 +129,9 @@ class CeleryApp(Celery):
             self.conf.beat_schedule = _overall_schedule(*self.__schedules_function())
         if self.__routes_function:
             self.conf.task_routes = self.__routes_function()
+
+        monitoring_registry = initialize_monitoring()
+        start_http_server(port=config.CELERY_PROMETHEUS_PORT, registry=monitoring_registry)
 
     def gen_task_name(self, name: str, module: str) -> str:
         """
