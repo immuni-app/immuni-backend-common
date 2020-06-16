@@ -25,6 +25,21 @@ class HeaderImmuniContentTypeJson(doc.String):
         super().__init__(name="Content-Type", description="application/json; charset=utf-8")
 
 
+class HeaderImmuniDummyData(doc.Boolean):
+    """
+    Documentation class for the Immuni-Dummy-Data header.
+    """
+
+    DATA_KEY = "Immuni-Dummy-Data"
+
+    def __init__(self) -> None:
+        super().__init__(
+            name=self.DATA_KEY,
+            description="Whether the current request is dummy. Dummy requests are ignored.",
+            choices=("true", "false"),
+        )
+
+
 class UploadedTemporaryExposureKey:
     """
     Documentation class for Uploaded Temporary Exposure Key.
