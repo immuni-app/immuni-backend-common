@@ -28,6 +28,7 @@ class Subsystem(Enum):
 
     API = "api"
     BUILD = "build"
+    CELERY = "celery"
 
 
 # NOTE: Using Gauge since Info does not work in a Prometheus multiprocess setup.
