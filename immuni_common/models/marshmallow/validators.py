@@ -27,11 +27,30 @@ class Base64StringValidator(Validator):
     A validator for base64 strings.
     """
 
-    def __init__(self, length: Optional[int]) -> None:
+    def __init__(
+        self,
+        length: Optional[int],
+        min_encoded_length: Optional[int],
+        max_encoded_length: Optional[int],
+    ) -> None:
         super().__init__()
         self._length = length
+        self._min_encoded_length = min_encoded_length
+        self._max_encoded_length = max_encoded_length
 
     def __call__(self, value: str) -> str:
+        if self._min_encoded_length and (length := len(value)) < self._min_encoded_length:
+            raise ValidationError(
+                f"Invalid base64 string length: {length} minimum required length "
+                f"{self._min_encoded_length}."
+            )
+
+        if self._max_encoded_length and (length := len(value)) > self._max_encoded_length:
+            raise ValidationError(
+                f"Invalid base64 string length: {length} maximum required length "
+                f"{self._max_encoded_length}."
+            )
+
         try:
             decoded = base64.b64decode(value)
         except binascii.Error:
