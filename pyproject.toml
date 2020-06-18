@@ -26,6 +26,11 @@ load-plugins = "pylint_mongoengine"
 # We just want to ignore the files in `immuni_exposure_reporting/protobuf/models/*`
 ignore-patterns="schema_v[0-9]+_pb2.py"
 
+[tool.pylint.SIMILARITIES]
+# NOTE: workaround valid until the disable=duplicate-code works.
+#  See https://github.com/PyCQA/pylint/issues/214
+min-similarity-lines=5
+
 [tool.pylint.TYPECHECK]
 ignored-classes = "Session"
 
