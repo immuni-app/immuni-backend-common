@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import Tuple
 
 import pytest
 from pytest_sanic.utils import TestClient
@@ -12,7 +11,7 @@ from immuni_common.helpers.utils import WeightedPair
 
 
 @pytest.mark.parametrize(
-    "conf",
+    "bad_request_weight, not_found_weight, expected_status",
     [
         (0, 1, HTTPStatus.NOT_FOUND),
         (1, 0, HTTPStatus.BAD_REQUEST),
@@ -21,10 +20,12 @@ from immuni_common.helpers.utils import WeightedPair
     ],
 )
 async def test_dummy_endpoints_simple(
-    sanic: Sanic, conf: Tuple[int, int, HTTPStatus], client: TestClient
+    sanic: Sanic,
+    bad_request_weight: int,
+    not_found_weight: int,
+    expected_status: HTTPStatus,
+    client: TestClient,
 ) -> None:
-    bad_request_weight, not_found_weight, expected_status = conf
-
     @sanic.route("/dummy")
     @handle_dummy_requests(
         [

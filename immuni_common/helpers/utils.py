@@ -13,7 +13,7 @@
 
 import os
 import pkgutil
-from secrets import randbelow
+import random
 from types import ModuleType
 from typing import Any, Dict, List, NamedTuple
 
@@ -77,11 +77,6 @@ def weighted_random(pairs: List[WeightedPair]) -> Any:
 
     :param pairs: The list of WeightedPair to pick the random value from.
     """
-    pairs = [p for p in pairs if p.weight > 0]
-    total = sum(pair.weight for pair in pairs)
-    choice = randbelow(total)
-    for (weight, value) in pairs:
-        choice -= weight
-        if choice <= 0:
-            return value
-    raise RuntimeError("Got to the end of a weighted_random. This should never happen.")
+    return random.choices(
+        population=tuple(p.payload for p in pairs), weights=tuple(p.weight for p in pairs), k=1,
+    )[0]
