@@ -10,21 +10,27 @@
 #  GNU Affero General Public License for more details.
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
-
+import asyncio
 import json
+import random
 from collections.abc import Iterable
 from datetime import date, datetime
 from functools import wraps
 from http import HTTPStatus
-from typing import Any, Awaitable, Callable, Dict, Optional, Union
+from typing import Any, Awaitable, Callable, Coroutine, Dict, List, Optional, Union
 
 from marshmallow import Schema, ValidationError
 from marshmallow.fields import Field
 from sanic.request import Request
 from sanic.response import HTTPResponse
+from sanic_openapi import doc
 
+from immuni_common.core import config
 from immuni_common.core.exceptions import ImmuniException, SchemaValidationException
+from immuni_common.helpers.utils import WeightedPair, weighted_random
 from immuni_common.models.enums import Location
+from immuni_common.models.marshmallow.fields import IntegerBoolField
+from immuni_common.models.swagger import HeaderImmuniDummyData
 
 _ALLOWED_JSON_CONTENT_TYPES = {
     "application/json; charset=utf-8",
@@ -174,6 +180,55 @@ def validate(*, location: Location, **fields: Union[Field, type],) -> Callable:
                 raise SchemaValidationException(
                     "Content type is not application/json for post request."
                 )
+
+        return _wrapper
+
+    return _decorator
+
+
+async def wait_configured_time() -> None:
+    """
+    Wait for the configured time.
+    This is usually useful to make dummy requests last a similar amount of time when compared to the
+    real ones, or slow down potential brute force attacks.
+    """
+    await asyncio.sleep(
+        random.normalvariate(
+            config.DUMMY_REQUEST_TIMEOUT_MILLIS, config.DUMMY_REQUEST_TIMEOUT_SIGMA
+        )
+        / 1000.0
+    )
+
+
+def handle_dummy_requests(
+    responses: List[WeightedPair],
+) -> Callable[
+    [Callable[..., Coroutine[Any, Any, HTTPResponse]]],
+    Callable[..., Coroutine[Any, Any, HTTPResponse]],
+]:
+    """
+    Decorator that allows handling dummy requests.
+    :param responses: A list of WeightedPair, where the payload is the response
+     to be returned with the given weight. The decorator will pick a random
+     response based on the given weights.
+    :return: The decorated function.
+    """
+
+    def _decorator(
+        f: Callable[..., Coroutine[Any, Any, HTTPResponse]]
+    ) -> Callable[..., Coroutine[Any, Any, HTTPResponse]]:
+        @validate(
+            location=Location.HEADERS,
+            is_dummy=IntegerBoolField(
+                required=True, allow_strings=True, data_key=HeaderImmuniDummyData.DATA_KEY,
+            ),
+        )
+        @doc.consumes(HeaderImmuniDummyData(), location="header", required=True)
+        async def _wrapper(*args: Any, is_dummy: bool, **kwargs: Any) -> HTTPResponse:
+            if is_dummy:
+                await wait_configured_time()
+                return weighted_random(responses)
+            return await f(*args, **kwargs)
 
         return _wrapper
 

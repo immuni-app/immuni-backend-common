@@ -13,8 +13,9 @@
 
 import os
 import pkgutil
+from secrets import randbelow
 from types import ModuleType
-from typing import Dict, List
+from typing import Any, Dict, List, NamedTuple
 
 
 def modules_in_package(package: ModuleType) -> List[str]:
@@ -52,3 +53,32 @@ def dense_dict(dictionary: Dict) -> Dict:
         for k, v in dictionary.items()
         if v is not None
     }
+
+
+# Note: This could be a Generic[T] with T as TypeVar. That would allow
+#  us to define a WeightedPair[str] and have the weighted_random
+#  return a valid typed str when used, but generic NamedTuples are not yet
+#  supported by mypy:
+#  https://github.com/python/mypy/issues/685
+class WeightedPair(NamedTuple):
+    """
+    Simple NamedTuple that allows us to describe
+    weighted key/value pairs for weighted random.
+    """
+
+    weight: int
+    payload: Any
+
+
+def weighted_random(pairs: List[WeightedPair]) -> Any:
+    """
+    Returns the value associated with
+    """
+    pairs = [p for p in pairs if p.weight > 0]
+    total = sum(pair.weight for pair in pairs)
+    choice = randbelow(total)
+    for (weight, value) in pairs:
+        choice -= weight
+        if choice <= 0:
+            return value
+    raise RuntimeError("Got to the end of a weighted_random. This should never happen.")
