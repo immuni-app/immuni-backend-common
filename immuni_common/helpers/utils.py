@@ -72,7 +72,10 @@ class WeightedPair(NamedTuple):
 
 def weighted_random(pairs: List[WeightedPair]) -> Any:
     """
-    Returns the value associated with
+    Returns one of the values in the WeightedPair list randomly based on the
+    weights defined in the given WeightedPair list.
+
+    :param pairs: The list of WeightedPair to pick the random value from.
     """
     pairs = [p for p in pairs if p.weight > 0]
     total = sum(pair.weight for pair in pairs)
