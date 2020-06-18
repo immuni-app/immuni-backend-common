@@ -10,6 +10,7 @@
 #  GNU Affero General Public License for more details.
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 import asyncio
 import json
 import random
@@ -208,6 +209,7 @@ def handle_dummy_requests(
 ]:
     """
     Decorator that allows handling dummy requests.
+
     :param responses: A list of WeightedPair, where the payload is the response
      to be returned with the given weight. The decorator will pick a random
      response based on the given weights.
