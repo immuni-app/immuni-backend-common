@@ -17,7 +17,7 @@ exclude = '''
 '''
 
 [tool.pylint.FORMAT]
-good-names = "f,T"
+good-names = "f,T,mu"
 
 [tool.pylint.MASTER]
 load-plugins = "pylint_mongoengine"

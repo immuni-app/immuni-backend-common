@@ -7,7 +7,7 @@ from sanic.request import Request
 from sanic.response import HTTPResponse
 
 from immuni_common.helpers.sanic import handle_dummy_requests
-from immuni_common.helpers.utils import WeightedPair
+from immuni_common.helpers.utils import WeightedPayload
 
 
 @pytest.mark.parametrize(
@@ -29,10 +29,10 @@ async def test_dummy_endpoints_simple(
     @sanic.route("/dummy")
     @handle_dummy_requests(
         [
-            WeightedPair(
+            WeightedPayload(
                 weight=bad_request_weight, payload=HTTPResponse(status=HTTPStatus.BAD_REQUEST)
             ),
-            WeightedPair(
+            WeightedPayload(
                 weight=not_found_weight, payload=HTTPResponse(status=HTTPStatus.NOT_FOUND)
             ),
         ]

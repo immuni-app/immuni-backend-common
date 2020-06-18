@@ -28,7 +28,7 @@ from sanic_openapi import doc
 
 from immuni_common.core import config
 from immuni_common.core.exceptions import ImmuniException, SchemaValidationException
-from immuni_common.helpers.utils import WeightedPair, weighted_random
+from immuni_common.helpers.utils import WeightedPayload, weighted_random
 from immuni_common.models.enums import Location
 from immuni_common.models.marshmallow.fields import IntegerBoolField
 from immuni_common.models.swagger import HeaderImmuniDummyData
@@ -187,22 +187,17 @@ def validate(*, location: Location, **fields: Union[Field, type],) -> Callable:
     return _decorator
 
 
-async def wait_configured_time() -> None:
+async def wait_configured_time(mu: float, sigma: float) -> None:
     """
     Wait for the configured time.
     This is usually useful to make dummy requests last a similar amount of time when compared to the
     real ones, or slow down potential brute force attacks.
     """
-    await asyncio.sleep(
-        random.normalvariate(
-            config.DUMMY_REQUEST_TIMEOUT_MILLIS, config.DUMMY_REQUEST_TIMEOUT_SIGMA
-        )
-        / 1000.0
-    )
+    await asyncio.sleep(random.normalvariate(mu, sigma) / 1000.0)
 
 
 def handle_dummy_requests(
-    responses: List[WeightedPair],
+    responses: List[WeightedPayload[HTTPResponse]],
 ) -> Callable[
     [Callable[..., Coroutine[Any, Any, HTTPResponse]]],
     Callable[..., Coroutine[Any, Any, HTTPResponse]],
@@ -228,7 +223,9 @@ def handle_dummy_requests(
         @doc.consumes(HeaderImmuniDummyData(), location="header", required=True)
         async def _wrapper(*args: Any, is_dummy: bool, **kwargs: Any) -> HTTPResponse:
             if is_dummy:
-                await wait_configured_time()
+                await wait_configured_time(
+                    mu=config.DUMMY_REQUEST_TIMEOUT_MILLIS, sigma=config.DUMMY_REQUEST_TIMEOUT_SIGMA
+                )
                 return weighted_random(responses)
             return await f(*args, **kwargs)
 

@@ -14,8 +14,11 @@
 import os
 import pkgutil
 import random
+from dataclasses import dataclass
 from types import ModuleType
-from typing import Any, Dict, List, NamedTuple
+from typing import Dict, Generic, List, TypeVar
+
+from immuni_common.core.exceptions import ImmuniException
 
 
 def modules_in_package(package: ModuleType) -> List[str]:
@@ -55,28 +58,32 @@ def dense_dict(dictionary: Dict) -> Dict:
     }
 
 
-# Note: This could be a Generic[T] with T as TypeVar. That would allow
-#  us to define a WeightedPair[str] and have the weighted_random
-#  return a valid typed str when used, but generic NamedTuples are not yet
-#  supported by mypy:
-#  https://github.com/python/mypy/issues/685
-class WeightedPair(NamedTuple):
+T = TypeVar("T")
+
+
+@dataclass(frozen=True)
+class WeightedPayload(Generic[T]):
     """
     Simple NamedTuple that allows us to describe
     weighted key/value pairs for weighted random.
     """
 
     weight: int
-    payload: Any
+    payload: T
 
 
-def weighted_random(pairs: List[WeightedPair]) -> Any:
+def weighted_random(pairs: List[WeightedPayload]) -> T:
     """
     Returns one of the values in the WeightedPair list randomly based on the
     weights defined in the given WeightedPair list.
 
     :param pairs: The list of WeightedPair to pick the random value from.
     """
+
+    # Note: We allow 0 weights so that this function is testable and tests are not random.
+    if any(pair.weight < 0 for pair in pairs):
+        raise ImmuniException("Cannot perform a weighted random with negative weights.")
+
     return random.choices(
         population=tuple(p.payload for p in pairs), weights=tuple(p.weight for p in pairs), k=1,
     )[0]
