@@ -13,8 +13,12 @@
 
 import os
 import pkgutil
+import random
+from dataclasses import dataclass
 from types import ModuleType
-from typing import Dict, List
+from typing import Dict, Generic, List, TypeVar
+
+from immuni_common.core.exceptions import ImmuniException
 
 
 def modules_in_package(package: ModuleType) -> List[str]:
@@ -52,3 +56,34 @@ def dense_dict(dictionary: Dict) -> Dict:
         for k, v in dictionary.items()
         if v is not None
     }
+
+
+T = TypeVar("T")
+
+
+@dataclass(frozen=True)
+class WeightedPayload(Generic[T]):
+    """
+    Simple NamedTuple that allows us to describe
+    weighted key/value pairs for weighted random.
+    """
+
+    weight: int
+    payload: T
+
+
+def weighted_random(pairs: List[WeightedPayload]) -> T:
+    """
+    Returns one of the values in the WeightedPair list randomly based on the
+    weights defined in the given WeightedPair list.
+
+    :param pairs: The list of WeightedPair to pick the random value from.
+    """
+
+    # Note: We allow 0 weights so that this function is testable and tests are not random.
+    if any(pair.weight < 0 for pair in pairs):
+        raise ImmuniException("Cannot perform a weighted random with negative weights.")
+
+    return random.choices(
+        population=tuple(p.payload for p in pairs), weights=tuple(p.weight for p in pairs), k=1,
+    )[0]
