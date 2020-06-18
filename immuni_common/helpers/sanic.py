@@ -208,7 +208,7 @@ def handle_dummy_requests(
     Callable[..., Coroutine[Any, Any, HTTPResponse]],
 ]:
     """
-    Decorator that allows handling dummy requests.
+    Decorator that allows the system to handle dummy requests.
 
     :param responses: A list of WeightedPair, where the payload is the response
      to be returned with the given weight. The decorator will pick a random
