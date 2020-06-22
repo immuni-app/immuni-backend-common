@@ -6,6 +6,7 @@ from sanic import Sanic
 from sanic.request import Request
 from sanic.response import HTTPResponse
 
+from immuni_common.core.exceptions import NoBatchesException
 from immuni_common.helpers.sanic import handle_dummy_requests
 from immuni_common.helpers.utils import WeightedPayload
 
@@ -32,9 +33,7 @@ async def test_dummy_endpoints_simple(
             WeightedPayload(
                 weight=bad_request_weight, payload=HTTPResponse(status=HTTPStatus.BAD_REQUEST)
             ),
-            WeightedPayload(
-                weight=not_found_weight, payload=HTTPResponse(status=HTTPStatus.NOT_FOUND)
-            ),
+            WeightedPayload(weight=not_found_weight, payload=NoBatchesException()),
         ]
     )
     async def dummy(request: Request) -> HTTPResponse:
