@@ -27,7 +27,7 @@ from sanic.response import HTTPResponse
 from sanic_openapi import doc
 
 from immuni_common.core import config
-from immuni_common.core.exceptions import ImmuniException, SchemaValidationException, ApiException
+from immuni_common.core.exceptions import ApiException, ImmuniException, SchemaValidationException
 from immuni_common.helpers.utils import WeightedPayload, weighted_random
 from immuni_common.models.enums import Location
 from immuni_common.models.marshmallow.fields import IntegerBoolField
