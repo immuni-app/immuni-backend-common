@@ -27,7 +27,7 @@ from sanic.response import HTTPResponse
 from sanic_openapi import doc
 
 from immuni_common.core import config
-from immuni_common.core.exceptions import ImmuniException, SchemaValidationException
+from immuni_common.core.exceptions import ApiException, ImmuniException, SchemaValidationException
 from immuni_common.helpers.utils import WeightedPayload, weighted_random
 from immuni_common.models.enums import Location
 from immuni_common.models.marshmallow.fields import IntegerBoolField
@@ -197,7 +197,7 @@ async def wait_configured_time(mu: float, sigma: float) -> None:
 
 
 def handle_dummy_requests(
-    responses: List[WeightedPayload[HTTPResponse]],
+    responses: List[WeightedPayload[Union[HTTPResponse, ApiException]]],
 ) -> Callable[
     [Callable[..., Coroutine[Any, Any, HTTPResponse]]],
     Callable[..., Coroutine[Any, Any, HTTPResponse]],
@@ -207,7 +207,8 @@ def handle_dummy_requests(
 
     :param responses: A list of WeightedPair, where the payload is the response
      to be returned with the given weight. The decorator will pick a random
-     response based on the given weights.
+     response based on the given weights. Payloads can be HTTPResponse or ApiException.
+     If the payload is an ApiException it will simply be raised.
     :return: The decorated function.
     """
 
@@ -226,7 +227,10 @@ def handle_dummy_requests(
                 await wait_configured_time(
                     mu=config.DUMMY_REQUEST_TIMEOUT_MILLIS, sigma=config.DUMMY_REQUEST_TIMEOUT_SIGMA
                 )
-                return weighted_random(responses)
+                selected_response = weighted_random(responses)
+                if isinstance(selected_response, ApiException):
+                    raise selected_response
+                return selected_response
             return await f(*args, **kwargs)
 
         return _wrapper
