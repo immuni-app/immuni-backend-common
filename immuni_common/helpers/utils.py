@@ -72,7 +72,7 @@ class WeightedPayload(Generic[T]):
     payload: T
 
 
-def weighted_random(pairs: List[WeightedPayload]) -> T:
+def weighted_random(pairs: List[WeightedPayload[T]]) -> T:
     """
     Returns one of the values in the WeightedPair list randomly based on the
     weights defined in the given WeightedPair list.
