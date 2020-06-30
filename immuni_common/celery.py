@@ -131,7 +131,13 @@ class CeleryApp(Celery):
             self.conf.task_routes = self.__routes_function()
 
         monitoring_registry = initialize_monitoring()
-        start_http_server(port=config.CELERY_PROMETHEUS_PORT, registry=monitoring_registry)
+        try:
+            start_http_server(port=config.CELERY_PROMETHEUS_PORT, registry=monitoring_registry)
+        except OSError as exception:
+            # More than one Celery is running on the same machine, so it is enough that one of them
+            # starts the monitoring server.
+            if "Address already in use" not in str(exception):
+                raise
 
     def gen_task_name(self, name: str, module: str) -> str:
         """
