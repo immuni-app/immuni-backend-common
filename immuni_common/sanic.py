@@ -27,6 +27,7 @@ from sanic_openapi import doc, swagger_blueprint
 from immuni_common.core import config
 from immuni_common.core.exceptions import ApiException
 from immuni_common.core.managers import BaseManagers
+from immuni_common.helpers.cache import cache
 from immuni_common.helpers.logging import get_sanic_logger_config
 from immuni_common.helpers.sanic import json_response
 from immuni_common.models.enums import Environment
@@ -68,12 +69,14 @@ def create_app(
     @app.route("/")
     @doc.summary("Health check.")
     @doc.response(HTTPStatus.OK.value, "Ok", description="The server is running ok.")
+    @cache(no_store=True)
     async def health_check(request: Request) -> HTTPResponse:
         return HTTPResponse(status=HTTPStatus.OK.value)
 
     # TODO: Evaluate whether to expose it over another port.
     @app.route("/metrics")
     @doc.summary("Expose Prometheus metrics.")
+    @cache(no_store=True)
     def metrics(request: Request) -> HTTPResponse:
         latest_metrics = prometheus_client.generate_latest(monitoring_registry)
         return HTTPResponse(
