@@ -56,6 +56,7 @@ authors = []
 aioredis = { version = "==1.3.1", optional = true }
 celery = {version = "==4.4.2", extras = ["redis"], optional = true }
 croniter = {version = "==0.3.31", optional = true}
+dnspython = "<2.0.0"  # NOTE: not to break mongoengine, which does not pin it properly as of 2020-07
 gunicorn = "==20.0.4"
 marshmallow = "==3.5.2"
 mongoengine = "==0.20.0"
