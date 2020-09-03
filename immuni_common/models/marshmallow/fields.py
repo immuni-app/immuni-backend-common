@@ -35,7 +35,7 @@ class AttenuationDurations(List):
         super().__init__(
             Integer(validate=Range(min=0, max=sys.maxsize)),
             required=True,
-            validate=Length(min=3, max=3),
+            validate=Length(min=3, max=4),
         )
 
 
