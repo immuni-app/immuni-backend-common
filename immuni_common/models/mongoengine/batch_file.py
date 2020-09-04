@@ -15,15 +15,17 @@ from __future__ import annotations
 
 import logging
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from bson import ObjectId
+from immuni_common.models.mongoengine.counter import Counter, CounterNotFoundException
 from mongoengine import BinaryField, DateTimeField, Document, EmbeddedDocumentListField, IntField
 
 from immuni_common.core.exceptions import NoBatchesException
 from immuni_common.models.mongoengine.temporary_exposure_key import TemporaryExposureKey
 
 _LOGGER = logging.getLogger(__name__)
+_BATCH_FILE_MIN_INDEX = 1
 
 
 class BatchFile(Document):
@@ -31,7 +33,7 @@ class BatchFile(Document):
     Document to wrap a batch of TEKs.
     """
 
-    index: int = IntField(min_value=0, required=True, unique=True)
+    index: int = IntField(min_value=_BATCH_FILE_MIN_INDEX, required=True, unique=True)
     keys: List[TemporaryExposureKey] = EmbeddedDocumentListField(
         TemporaryExposureKey, required=True
     )
@@ -46,6 +48,36 @@ class BatchFile(Document):
     meta = {"indexes": ["-index", "period_start"]}
 
     @classmethod
+    def _get_next_index(cls) -> int:
+        common_arguments = dict(collection="batch", field="index")
+        try:
+            return Counter.get_next(**common_arguments)
+        except CounterNotFoundException:
+            last_batch = cls.objects.order_by("-index").only("index").first()
+            start_value = last_batch.index if last_batch is not None else _BATCH_FILE_MIN_INDEX
+            return Counter.create(**common_arguments, start_value=start_value).save().value
+
+    @classmethod
+    def create_and_save(
+        cls,
+        keys: List[TemporaryExposureKey],
+        period_start: datetime,
+        period_end: datetime,
+        sub_batch_index: int,
+        sub_batch_count: int,
+        client_content: bytes,
+    ) -> BatchFile:
+        return cls(
+            index=cls._get_next_index(),
+            keys=keys,
+            period_start=period_start,
+            period_end=period_end,
+            sub_batch_index=sub_batch_index,
+            sub_batch_count=sub_batch_count,
+            client_content=client_content,
+        ).save()
+
+    @classmethod
     def from_index(cls, index: int) -> BatchFile:
         """
         Fetch a single BatchFile from the database given its index.
@@ -57,16 +89,16 @@ class BatchFile(Document):
         return BatchFile.objects.get(index=index)
 
     @classmethod
-    def get_latest_info(cls) -> Optional[Tuple[datetime, int]]:
+    def get_latest_period(cls) -> Optional[datetime]:
         """
-        Fetch the most recent BatchFile and return its period_end and index.
+        Fetch the most recent BatchFile and return its period_end.
 
-        :return: the period_end and index tuple if there is at least a BatchFile, None otherwise.
+        :return: the period_end if there is at least a BatchFile, None otherwise.
         """
-        last_batch = cls.objects.order_by("-index").only("period_end", "index").first()
+        last_batch = cls.objects.order_by("-index").only("period_end").first()
         if not last_batch:
             return None
-        return last_batch.period_end, last_batch.index
+        return last_batch.period_end
 
     @classmethod
     def delete_older_than(cls, datetime_: datetime) -> int:
