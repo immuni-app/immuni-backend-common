@@ -77,7 +77,7 @@ def create_app(
     @app.route("/metrics")
     @doc.summary("Expose Prometheus metrics.")
     @cache(no_store=True)
-    def metrics(request: Request) -> HTTPResponse:
+    async def metrics(request: Request) -> HTTPResponse:
         latest_metrics = prometheus_client.generate_latest(monitoring_registry)
         return HTTPResponse(
             body=latest_metrics.decode("utf-8"),
