@@ -76,5 +76,5 @@ celery = ["celery", "croniter"]
 immuni-common-dev = { path = "dev", develop = true}
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=0.12", "setuptools"]
 build-backend = "poetry.masonry.api"
