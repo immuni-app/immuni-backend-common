@@ -18,7 +18,7 @@ from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
 from bson import ObjectId
-from mongoengine import BinaryField, DateTimeField, Document, EmbeddedDocumentListField, IntField
+from mongoengine import BinaryField, DateTimeField, Document, EmbeddedDocumentListField, IntField, StringField
 
 from immuni_common.core.exceptions import NoBatchesException
 from immuni_common.models.mongoengine.temporary_exposure_key import TemporaryExposureKey
@@ -40,6 +40,10 @@ class BatchFile(Document):
 
     sub_batch_index: int = IntField()
     sub_batch_count: int = IntField()
+
+    origin: str = StringField(required=True)
+
+    batch_tag: str = StringField(null=True)
 
     client_content: bytes = BinaryField()
 
