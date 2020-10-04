@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict
 
-from mongoengine import EmbeddedDocument, IntField, StringField
+from mongoengine import EmbeddedDocument, IntField, StringField, ListField
 
 from immuni_common.helpers.sanic import Serializable
 from immuni_common.models.enums import TransmissionRiskLevel
@@ -33,6 +33,7 @@ class TemporaryExposureKey(EmbeddedDocument, Serializable):
     transmission_risk_level: Enum = EnumField(TransmissionRiskLevel)
     rolling_start_number: int = IntField(required=True)
     rolling_period: int = IntField(required=False)
+    country_of_interest: str = ListField(required=False)
 
     @property
     def created_at(self) -> datetime:
@@ -66,4 +67,5 @@ class TemporaryExposureKey(EmbeddedDocument, Serializable):
             key_data=self.key_data,
             transmission_risk_level=self.transmission_risk_level.value,  # pylint: disable=no-member
             rolling_start_number=self.rolling_start_number,
+            country_of_interest=self.country_of_interest
         )
