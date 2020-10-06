@@ -28,7 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class BatchFileEu(Document):
     """
-    Document to wrap a batch of TEKs.
+    Document to wrap a batch of EU-TEKs .
     """
 
     index: int = IntField(min_value=0, required=True, unique=True)
@@ -48,24 +48,26 @@ class BatchFileEu(Document):
     meta = {"indexes": ["-index", "period_start"]}
 
     @classmethod
-    def from_index(cls, index: int) -> BatchFileEu:
+    def from_index(cls, country: str, index: int) -> BatchFileEu:
         """
         Fetch a single BatchFile from the database given its index.
 
+        :param country: the country of interest.
         :param index: the index of the BatchFile to fetch.
         :return: the BatchFile, if any.
         :raises: DoesNotExist if the BatchFile associated with the given index does not exist.
         """
-        return BatchFileEu.objects.get(index=index)
+        return BatchFileEu.objects.filter(origin=country).get(index=index)
 
     @classmethod
-    def get_latest_info(cls) -> Optional[Tuple[datetime, int]]:
+    def get_latest_info(cls, country: str) -> Optional[Tuple[datetime, int]]:
         """
         Fetch the most recent BatchFile and return its period_end and index.
 
+        :param country: the country of interest.
         :return: the period_end and index tuple if there is at least a BatchFile, None otherwise.
         """
-        last_batch = cls.objects.order_by("-index").only("period_end", "index").first()
+        last_batch = cls.objects.filter(origin=country).order_by("-index").only("period_end", "index").first()
         if not last_batch:
             return None
         return last_batch.period_end, last_batch.index
@@ -109,16 +111,17 @@ class BatchFileEu(Document):
         ]
 
     @classmethod
-    def get_oldest_and_newest_indexes(cls, days: int) -> Dict[str, int]:
+    def get_oldest_and_newest_indexes(cls, country: str, days: int) -> Dict[str, int]:
         """
         Fetch the oldest and newest indexes of the last N days.
 
         :param days: the number of days since when to look for relevant BatchFiles.
+        :param country: the country of interest.
         :return: the dictionary with the oldest and newest indexes of the last N days.
         :raises: NoBatchesException if there are no batches in the database.
         """
         try:
-            result = next(cls.objects.aggregate(*cls._get_oldest_and_newest_indexes_pipeline(days)))
+            result = next(cls.objects.filter(origin=country).aggregate(*cls._get_oldest_and_newest_indexes_pipeline(days)))
         except StopIteration:
             raise NoBatchesException()
         return result
