@@ -48,7 +48,7 @@ class BatchFileEu(Document):
     meta = {
         'indexes': [
             {'fields': ("origin", "index"), 'unique': True},
-            {'fields': ("origin", "period_start"), 'unique': True}
+            {'fields': ("origin", "period_start")}
         ]
     }
 
