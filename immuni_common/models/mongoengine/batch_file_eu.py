@@ -31,7 +31,7 @@ class BatchFileEu(Document):
     Document to wrap a batch of EU-TEKs .
     """
 
-    index: int = IntField(min_value=0, required=True, unique=True)
+    index: int = IntField(min_value=0, required=True)
     keys: List[TemporaryExposureKey] = EmbeddedDocumentListField(
         TemporaryExposureKey, required=True
     )
@@ -45,7 +45,7 @@ class BatchFileEu(Document):
 
     client_content: bytes = BinaryField()
 
-    meta = {"indexes": ["-index", "period_start"]}
+    meta = {"indexes": ["-origin", "-index", "period_start"]}
 
     @classmethod
     def from_index(cls, country: str, index: int) -> BatchFileEu:
