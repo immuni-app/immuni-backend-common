@@ -45,7 +45,12 @@ class BatchFileEu(Document):
 
     client_content: bytes = BinaryField()
 
-    meta = {"indexes": ["-origin", "-index", "period_start"]}
+    meta = {
+        'indexes': [
+            {'fields': ("origin", "index"), 'unique': True},
+            {'fields': ("origin", "period_start"), 'unique': True}
+        ]
+    }
 
     @classmethod
     def from_index(cls, country: str, index: int) -> BatchFileEu:
