@@ -18,7 +18,14 @@ from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
 from bson import ObjectId
-from mongoengine import BinaryField, DateTimeField, Document, EmbeddedDocumentListField, IntField, StringField
+from mongoengine import (
+    BinaryField,
+    DateTimeField,
+    Document,
+    EmbeddedDocumentListField,
+    IntField,
+    StringField,
+)
 
 from immuni_common.core.exceptions import NoBatchesException
 from immuni_common.models.mongoengine.temporary_exposure_key import TemporaryExposureKey
@@ -46,9 +53,9 @@ class BatchFileEu(Document):
     client_content: bytes = BinaryField()
 
     meta = {
-        'indexes': [
-            {'fields': ("origin", "index"), 'unique': True},
-            {'fields': ("origin", "period_start")}
+        "indexes": [
+            {"fields": ("origin", "index"), "unique": True},
+            {"fields": ("origin", "period_start")},
         ]
     }
 
@@ -72,7 +79,12 @@ class BatchFileEu(Document):
         :param country: the country of interest.
         :return: the period_end and index tuple if there is at least a BatchFile, None otherwise.
         """
-        last_batch = cls.objects.filter(origin=country).order_by("-index").only("period_end", "index").first()
+        last_batch = (
+            cls.objects.filter(origin=country)
+            .order_by("-index")
+            .only("period_end", "index")
+            .first()
+        )
         if not last_batch:
             return None
         return last_batch.period_end, last_batch.index
@@ -126,7 +138,11 @@ class BatchFileEu(Document):
         :raises: NoBatchesException if there are no batches in the database.
         """
         try:
-            result = next(cls.objects.filter(origin=country).aggregate(*cls._get_oldest_and_newest_indexes_pipeline(days)))
+            result = next(
+                cls.objects.filter(origin=country).aggregate(
+                    *cls._get_oldest_and_newest_indexes_pipeline(days)
+                )
+            )
         except StopIteration:
             raise NoBatchesException()
         return result

@@ -67,5 +67,5 @@ class TemporaryExposureKey(EmbeddedDocument, Serializable):
             key_data=self.key_data,
             transmission_risk_level=self.transmission_risk_level.value,  # pylint: disable=no-member
             rolling_start_number=self.rolling_start_number,
-            country_of_interest=self.country_of_interest
+            country_of_interest=self.country_of_interest,
         )
