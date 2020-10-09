@@ -18,7 +18,14 @@ from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
 from bson import ObjectId
-from mongoengine import BinaryField, DateTimeField, Document, EmbeddedDocumentListField, IntField, StringField
+from mongoengine import (
+    BinaryField,
+    DateTimeField,
+    Document,
+    EmbeddedDocumentListField,
+    IntField,
+    StringField,
+)
 
 from immuni_common.core.exceptions import NoBatchesException
 from immuni_common.models.mongoengine.temporary_exposure_key import TemporaryExposureKey
