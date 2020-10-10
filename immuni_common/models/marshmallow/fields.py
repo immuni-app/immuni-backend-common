@@ -154,3 +154,17 @@ class RiskScore(Integer):
 
     def __init__(self) -> None:
         super().__init__(required=True, validate=Range(min=0, max=sys.maxsize))
+
+
+class Countries(List):
+    """
+    Validate the list of countries of interest
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            String(validate=validate.Regexp(r"^[A-Z]{2}$")),
+            required=False,
+            missing=None,
+            validate=Length(min=0, max=27)
+        )
