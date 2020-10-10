@@ -166,5 +166,5 @@ class Countries(List):
             String(validate=validate.Regexp(r"^[A-Z]{2}$")),
             required=False,
             missing=None,
-            validate=Length(min=0, max=27)
+            validate=Length(min=0, max=27),
         )
