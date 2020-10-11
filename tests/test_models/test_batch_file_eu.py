@@ -55,7 +55,7 @@ def batch_files_eu() -> List[BatchFileEu]:
                     period_end=datetime.utcnow(),
                     sub_batch_index=1,
                     sub_batch_count=1,
-                    origin="DK"
+                    origin="DK",
                 ).save()
             )
     return batches
@@ -88,5 +88,3 @@ def test_oldest_newest_batches_eu(batch_files_eu: List[BatchFileEu]) -> None:
         "oldest": 7,
         "newest": 10,
     }
-
-

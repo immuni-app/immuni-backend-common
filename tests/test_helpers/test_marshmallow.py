@@ -27,7 +27,8 @@ from immuni_common.models.marshmallow.fields import (
     IsoDate,
     OtpCode,
     Province,
-    Countries)
+    Countries,
+)
 from immuni_common.models.marshmallow.schemas import OtpDataSchema
 from immuni_common.models.marshmallow.validators import IsoDateValidator, OtpCodeValidator
 
@@ -64,8 +65,8 @@ def test_base64_string_success(value: str) -> None:
 @mark.parametrize(
     "length, value",
     (
-            (None, "non-base64-string"),
-            (16, base64.b64encode("non-16-bytes-long-string".encode("utf-8"))),
+        (None, "non-base64-string"),
+        (16, base64.b64encode("non-16-bytes-long-string".encode("utf-8"))),
     ),
 )
 def test_base64_string_failure_on_value(length: Optional[int], value: str) -> None:
@@ -97,17 +98,17 @@ def test_base64_string_length(value: str) -> None:
 @mark.parametrize(
     "otp",
     (
-            "XSZ4RAQ3KY",
-            "X65FS597US",
-            "S8SJ6UZRHQ",
-            "8UZLUU8UW5",
-            "Z86JQXHAW8",
-            "HEQHQ7FYQZ",
-            "JAS62UHE58",
-            "FQ2YQE43LR",
-            "87S8QWH1EE",
-            "527AZ66UHX",
-            generate_otp(),
+        "XSZ4RAQ3KY",
+        "X65FS597US",
+        "S8SJ6UZRHQ",
+        "8UZLUU8UW5",
+        "Z86JQXHAW8",
+        "HEQHQ7FYQZ",
+        "JAS62UHE58",
+        "FQ2YQE43LR",
+        "87S8QWH1EE",
+        "527AZ66UHX",
+        generate_otp(),
     ),
 )
 def test_otp_code_success(otp: str) -> None:
@@ -117,25 +118,25 @@ def test_otp_code_success(otp: str) -> None:
 @mark.parametrize(
     "value",
     (
-            generate_otp(length=2, skip_validation=True),
-            generate_otp(length=9, skip_validation=True),
-            generate_otp(length=11, skip_validation=True),
-            generate_otp(length=100, skip_validation=True),
-            "AEFHIJ1234",  # 10 chars, all allowed.
-            "AEFHIJ123N",  # 10 chars, one not allowed, check digit (i.e., N).
-            "NEFHIJ1234",  # 10 chars, one not allowed (i.e., N).
-            # Generated as valid, then replaced check-digit with first, and assessed invalidity.
-            "UFKLYIZXLU",
-            "3QW6EYRU53",
-            "47F2JAKRF4",
-            "F5YEH3128F",
-            "QK7W33UU8Q",
-            "8L4FQZ8UX8",
-            "6EQSE6KW56",
-            "XZ2LR2245X",
-            "A6F3XQQ1YA",
-            "HL2S4U3A6H",
-            *(v for v in _COMMON_INVALID_FIELD_VALUES if hasattr(v, "__len__")),
+        generate_otp(length=2, skip_validation=True),
+        generate_otp(length=9, skip_validation=True),
+        generate_otp(length=11, skip_validation=True),
+        generate_otp(length=100, skip_validation=True),
+        "AEFHIJ1234",  # 10 chars, all allowed.
+        "AEFHIJ123N",  # 10 chars, one not allowed, check digit (i.e., N).
+        "NEFHIJ1234",  # 10 chars, one not allowed (i.e., N).
+        # Generated as valid, then replaced check-digit with first, and assessed invalidity.
+        "UFKLYIZXLU",
+        "3QW6EYRU53",
+        "47F2JAKRF4",
+        "F5YEH3128F",
+        "QK7W33UU8Q",
+        "8L4FQZ8UX8",
+        "6EQSE6KW56",
+        "XZ2LR2245X",
+        "A6F3XQQ1YA",
+        "HL2S4U3A6H",
+        *(v for v in _COMMON_INVALID_FIELD_VALUES if hasattr(v, "__len__")),
     ),
 )
 def test_otp_code_failure(value: str) -> None:
@@ -173,11 +174,11 @@ def test_symptoms_started_on_success_value(value: date) -> None:
 @mark.parametrize(
     "value",
     (
-            "02/29/2020",
-            "20200229",
-            "20200229T21:23:58.970460+00:00",
-            "2020-02-29T21:23:58.970460+00:00",
-            *_COMMON_INVALID_FIELD_VALUES,
+        "02/29/2020",
+        "20200229",
+        "20200229T21:23:58.970460+00:00",
+        "2020-02-29T21:23:58.970460+00:00",
+        *_COMMON_INVALID_FIELD_VALUES,
     ),
 )
 def test_symptoms_started_on_failure_format(value: str) -> None:
@@ -188,8 +189,8 @@ def test_symptoms_started_on_failure_format(value: str) -> None:
 @mark.parametrize(
     "value",
     (
-            date.today() + timedelta(days=1),
-            date.today() - timedelta(days=1) - IsoDateValidator._ALLOWED_TIMEDELTA,
+        date.today() + timedelta(days=1),
+        date.today() - timedelta(days=1) - IsoDateValidator._ALLOWED_TIMEDELTA,
     ),
 )
 def test_symptoms_started_on_failure_value(value: date) -> None:
