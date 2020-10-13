@@ -18,6 +18,7 @@ from typing import List
 
 import pytest
 from freezegun import freeze_time
+from mongoengine import get_db
 
 from immuni_common.models.enums import TransmissionRiskLevel
 from immuni_common.models.mongoengine.batch_file_eu import BatchFileEu
@@ -88,3 +89,19 @@ def test_oldest_newest_batches_eu(batch_files_eu: List[BatchFileEu]) -> None:
         "oldest": 7,
         "newest": 10,
     }
+
+
+def test_indexes(batch_files_eu: List[BatchFileEu]) -> None:
+    explain = get_db().command(
+        "aggregate",
+        BatchFileEu._meta["collection"],
+        pipeline=BatchFileEu._get_oldest_and_newest_indexes_pipeline(2),
+        explain=True,
+    )
+
+    assert (
+            explain["stages"][0]["$cursor"]["queryPlanner"]["winningPlan"]["stage"]
+            == "COLLSCAN"
+    )
+    # sort should not be executed
+    assert len(explain["stages"]) == 4
