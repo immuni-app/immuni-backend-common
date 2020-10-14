@@ -48,8 +48,9 @@ class BatchFile(Document):
     sub_batch_index: int = IntField()
     sub_batch_count: int = IntField()
 
-    origin: str = StringField(required=True)
-
+    origin: str = StringField(required=True, default="IT")
+    # Used by the springBoot client to interact with the European Federation
+    # Gateway Service, it must be set to null.
     batch_tag: str = StringField(null=True)
 
     client_content: bytes = BinaryField()

@@ -56,7 +56,6 @@ def batch_files() -> List[BatchFile]:
                     period_end=datetime.utcnow(),
                     sub_batch_index=1,
                     sub_batch_count=1,
-                    origin="IT",
                 ).save()
             )
     return batches
