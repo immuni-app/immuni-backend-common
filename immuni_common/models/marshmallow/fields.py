@@ -25,6 +25,8 @@ from immuni_common.models.marshmallow.validators import (
     OtpCodeValidator,
 )
 
+VALID_COUNTRY_REGEX = r"^[A-Z]{2}$"
+
 
 class AttenuationDurations(List):
     """
@@ -45,12 +47,12 @@ class Base64String(String):
     """
 
     def __init__(
-        self,
-        *args: Any,
-        length: Optional[int] = None,
-        min_encoded_length: Optional[int] = None,
-        max_encoded_length: Optional[int] = None,
-        **kwargs: Any,
+            self,
+            *args: Any,
+            length: Optional[int] = None,
+            min_encoded_length: Optional[int] = None,
+            max_encoded_length: Optional[int] = None,
+            **kwargs: Any,
     ) -> None:
         """
         :param args: the positional arguments of the String field.
@@ -163,7 +165,7 @@ class Countries(List):
 
     def __init__(self) -> None:
         super().__init__(
-            String(validate=validate.Regexp(r"^[A-Z]{2}$")),
+            String(validate=validate.Regexp(VALID_COUNTRY_REGEX)),
             required=False,
             missing=None,
             validate=Length(min=0, max=27),
