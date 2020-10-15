@@ -99,9 +99,6 @@ def test_indexes(batch_files_eu: List[BatchFileEu]) -> None:
         explain=True,
     )
 
-    assert (
-            explain["stages"][0]["$cursor"]["queryPlanner"]["winningPlan"]["stage"]
-            == "COLLSCAN"
-    )
+    assert explain["stages"][0]["$cursor"]["queryPlanner"]["winningPlan"]["stage"] == "COLLSCAN"
     # sort should not be executed
     assert len(explain["stages"]) == 4

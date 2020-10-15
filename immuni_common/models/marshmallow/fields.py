@@ -47,12 +47,12 @@ class Base64String(String):
     """
 
     def __init__(
-            self,
-            *args: Any,
-            length: Optional[int] = None,
-            min_encoded_length: Optional[int] = None,
-            max_encoded_length: Optional[int] = None,
-            **kwargs: Any,
+        self,
+        *args: Any,
+        length: Optional[int] = None,
+        min_encoded_length: Optional[int] = None,
+        max_encoded_length: Optional[int] = None,
+        **kwargs: Any,
     ) -> None:
         """
         :param args: the positional arguments of the String field.
