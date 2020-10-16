@@ -22,6 +22,7 @@ from pytest import mark, raises
 from immuni_common.helpers.tests import generate_otp
 from immuni_common.models.marshmallow.fields import (
     Base64String,
+    Countries,
     EnumField,
     IntegerBoolField,
     IsoDate,
@@ -152,6 +153,11 @@ def test_province_success(value: str) -> None:
 def test_province_failure(value: str) -> None:
     with raises(ValidationError):
         Province().validate(value)  # type:ignore
+
+
+@mark.parametrize("value", [["DK", "DE"], ["ES", "AT", "PL"], []])
+def test_countries_success(value: list) -> None:
+    Countries().validate(value)  # type:ignore
 
 
 def test_symptoms_started_on_success_format() -> None:

@@ -29,7 +29,8 @@ ignore-patterns="schema_v[0-9]+_pb2.py"
 [tool.pylint.SIMILARITIES]
 # NOTE: workaround valid until the disable=duplicate-code works.
 #  See https://github.com/PyCQA/pylint/issues/214
-min-similarity-lines=5
+# TODO: restore 5 as soon as the BatchFile and Upload IT/EU classes are unified.
+min-similarity-lines=40
 
 [tool.pylint.TYPECHECK]
 ignored-classes = "Session"

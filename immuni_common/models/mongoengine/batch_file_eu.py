@@ -33,12 +33,12 @@ from immuni_common.models.mongoengine.temporary_exposure_key import TemporaryExp
 _LOGGER = logging.getLogger(__name__)
 
 
-class BatchFile(Document):
+class BatchFileEu(Document):
     """
-    Document to wrap a batch of TEKs.
+    Document to wrap a batch of EU-TEKs.
     """
 
-    index: int = IntField(min_value=0, required=True, unique=True)
+    index: int = IntField(min_value=0, required=True)
     keys: List[TemporaryExposureKey] = EmbeddedDocumentListField(
         TemporaryExposureKey, required=True
     )
@@ -48,34 +48,43 @@ class BatchFile(Document):
     sub_batch_index: int = IntField()
     sub_batch_count: int = IntField()
 
-    origin: str = StringField(required=True, default="IT")
-    # Used by the springBoot client to interact with the European Federation
-    # Gateway Service, it must be set to null.
-    batch_tag: str = StringField(null=True)
+    origin: str = StringField(required=True)
 
     client_content: bytes = BinaryField()
 
-    meta = {"indexes": ["-index", "period_start"]}
+    meta = {
+        "indexes": [
+            {"fields": ("origin", "index"), "unique": True},
+            {"fields": ("origin", "period_start")},
+        ]
+    }
 
     @classmethod
-    def from_index(cls, index: int) -> BatchFile:
+    def from_index(cls, country: str, index: int) -> BatchFileEu:
         """
         Fetch a single BatchFile from the database given its index.
 
+        :param country: the country of interest.
         :param index: the index of the BatchFile to fetch.
         :return: the BatchFile, if any.
         :raises: DoesNotExist if the BatchFile associated with the given index does not exist.
         """
-        return BatchFile.objects.get(index=index)
+        return BatchFileEu.objects.filter(origin=country).get(index=index)
 
     @classmethod
-    def get_latest_info(cls) -> Optional[Tuple[datetime, int]]:
+    def get_latest_info(cls, country: str) -> Optional[Tuple[datetime, int]]:
         """
         Fetch the most recent BatchFile and return its period_end and index.
 
+        :param country: the country of interest.
         :return: the period_end and index tuple if there is at least a BatchFile, None otherwise.
         """
-        last_batch = cls.objects.order_by("-index").only("period_end", "index").first()
+        last_batch = (
+            cls.objects.filter(origin=country)
+            .order_by("-index")
+            .only("period_end", "index")
+            .first()
+        )
         if not last_batch:
             return None
         return last_batch.period_end, last_batch.index
@@ -119,16 +128,21 @@ class BatchFile(Document):
         ]
 
     @classmethod
-    def get_oldest_and_newest_indexes(cls, days: int) -> Dict[str, int]:
+    def get_oldest_and_newest_indexes(cls, country: str, days: int) -> Dict[str, int]:
         """
         Fetch the oldest and newest indexes of the last N days.
 
         :param days: the number of days since when to look for relevant BatchFiles.
+        :param country: the country of interest.
         :return: the dictionary with the oldest and newest indexes of the last N days.
         :raises: NoBatchesException if there are no batches in the database.
         """
         try:
-            result = next(cls.objects.aggregate(*cls._get_oldest_and_newest_indexes_pipeline(days)))
+            result = next(
+                cls.objects.filter(origin=country).aggregate(
+                    *cls._get_oldest_and_newest_indexes_pipeline(days)
+                )
+            )
             result["oldest"] = int(result["oldest"])
             result["newest"] = int(result["newest"])
         except StopIteration:

@@ -25,6 +25,8 @@ from immuni_common.models.marshmallow.validators import (
     OtpCodeValidator,
 )
 
+VALID_COUNTRY_REGEX = r"^[A-Z]{2}$"
+
 
 class AttenuationDurations(List):
     """
@@ -154,3 +156,17 @@ class RiskScore(Integer):
 
     def __init__(self) -> None:
         super().__init__(required=True, validate=Range(min=0, max=sys.maxsize))
+
+
+class Countries(List):
+    """
+    Validate the list of countries of interest.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            String(validate=validate.Regexp(VALID_COUNTRY_REGEX)),
+            required=False,
+            missing=None,
+            validate=Length(min=0, max=27),
+        )
