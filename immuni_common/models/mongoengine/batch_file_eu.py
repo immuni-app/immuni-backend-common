@@ -35,7 +35,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class BatchFileEu(Document):
     """
-    Document to wrap a batch of EU-TEKs .
+    Document to wrap a batch of EU-TEKs.
     """
 
     index: int = IntField(min_value=0, required=True)

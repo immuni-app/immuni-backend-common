@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict
 
-from mongoengine import EmbeddedDocument, IntField, StringField, ListField
+from mongoengine import EmbeddedDocument, IntField, ListField, StringField
 
 from immuni_common.helpers.sanic import Serializable
 from immuni_common.models.enums import TransmissionRiskLevel

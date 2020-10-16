@@ -22,12 +22,12 @@ from pytest import mark, raises
 from immuni_common.helpers.tests import generate_otp
 from immuni_common.models.marshmallow.fields import (
     Base64String,
+    Countries,
     EnumField,
     IntegerBoolField,
     IsoDate,
     OtpCode,
     Province,
-    Countries,
 )
 from immuni_common.models.marshmallow.schemas import OtpDataSchema
 from immuni_common.models.marshmallow.validators import IsoDateValidator, OtpCodeValidator

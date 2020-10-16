@@ -160,7 +160,7 @@ class RiskScore(Integer):
 
 class Countries(List):
     """
-    Validate the list of countries of interest
+    Validate the list of countries of interest.
     """
 
     def __init__(self) -> None:
