@@ -143,6 +143,8 @@ class BatchFileEu(Document):
                     *cls._get_oldest_and_newest_indexes_pipeline(days)
                 )
             )
+            result["oldest"] = int(result["oldest"])
+            result["newest"] = int(result["newest"])
         except StopIteration:
             raise NoBatchesException()
         return result
