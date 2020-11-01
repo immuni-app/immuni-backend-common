@@ -26,4 +26,3 @@ class ImmuniUvicornWorker(UvicornWorker):
     """
 
     CONFIG_KWARGS = dict(lifespan="on")
-
