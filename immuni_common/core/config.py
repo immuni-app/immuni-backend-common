@@ -35,6 +35,8 @@ CELERY_PROMETHEUS_PORT: int = config("CELERY_PROMETHEUS_PORT", default=6666, cas
 
 CACHE_ENABLED: bool = config("CACHE_ENABLED", cast=bool, default=True)
 
+MAX_ALLOWED_BUILD: int = config("MAX_ALLOWED_BUILD", cast=int, default=20_000)
+
 MAX_ISO_DATE_BACKWARD_DIFF: int = config("MAX_ISO_DATE_BACKWARD_DIFF", cast=int, default=180)
 MAX_ROLLING_PERIOD: int = config("MAX_ROLLING_PERIOD", cast=int, default=1000)
 
