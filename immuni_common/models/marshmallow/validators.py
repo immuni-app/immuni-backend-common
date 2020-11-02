@@ -53,8 +53,8 @@ class Base64StringValidator(Validator):
 
         try:
             decoded = base64.b64decode(value)
-        except binascii.Error:
-            raise ValidationError("Invalid base64 string.")
+        except binascii.Error as error:
+            raise ValidationError("Invalid base64 string.") from error
         if self._length and (length := len(decoded)) != self._length:
             raise ValidationError(
                 f"Invalid base64 string length: {length} instead of {self._length}."
@@ -194,8 +194,8 @@ class OtpCodeValidator(Validator):
                 for index, char in enumerate(otp_without_check_digit)
             )
             check_digit = cls._CHECK_DIGIT_MAP[char_sum % 25]
-        except KeyError:
-            raise ValidationError("The OTP code contains forbidden characters.")
+        except KeyError as error:
+            raise ValidationError("The OTP code contains forbidden characters.") from error
         return check_digit
 
     @classmethod

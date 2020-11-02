@@ -35,12 +35,12 @@ commands:
       poetry_version:
         description: The version of Poetry to be installed.
         type: string
-        default: 1.0.5
+        default: 1.1.4
 
     steps:
       - run:
           name: "[python] Setup Poetry environment"
-          command: echo 'export POETRY_VERSION=1.0.5; export POETRY_HOME=./.poetry; export PATH=$POETRY_HOME/bin:$PATH' >> $BASH_ENV
+          command: echo 'export POETRY_VERSION=<< parameters.poetry_version >>; export POETRY_HOME=./.poetry; export PATH=$POETRY_HOME/bin:$PATH' >> $BASH_ENV
       - restore_cache:
           name: "[python] Restore the Poetry cache"
           keys:
@@ -120,7 +120,7 @@ jobs:
       - checkout
       - poetry-install:
           additional_parameters: --extras aioredis --extras celery
-          deps_cache_version: "v2"
+          deps_cache_version: "v3"
       - pytest:
           coverage_path: ./immuni_common
           min_coverage: 80
@@ -133,7 +133,7 @@ jobs:
       - checkout
       - poetry-install:
           additional_parameters: --extras aioredis --extras celery
-          deps_cache_version: "v2"
+          deps_cache_version: "v3"
       - run:
           name: "[python] Run checks"
           command: poetry run checks immuni_common --ci
