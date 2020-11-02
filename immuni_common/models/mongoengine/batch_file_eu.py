@@ -145,6 +145,6 @@ class BatchFileEu(Document):
             )
             result["oldest"] = int(result["oldest"])
             result["newest"] = int(result["newest"])
-        except StopIteration:
-            raise NoBatchesException()
+        except StopIteration as error:
+            raise NoBatchesException() from error
         return result

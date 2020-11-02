@@ -96,8 +96,8 @@ class EnumField(Field):
     def _deserialize(self, value: str, attr: Any, data: Any, **kwargs: Any) -> Any:
         try:
             return self._enum(value)
-        except ValueError:
-            raise ValidationError(f"{value} is not in {[e.name for e in self._enum]}")
+        except ValueError as error:
+            raise ValidationError(f"{value} is not in {[e.name for e in self._enum]}") from error
 
 
 class IntegerBoolField(Field):

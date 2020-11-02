@@ -194,8 +194,8 @@ class OtpCodeValidator(Validator):
                 for index, char in enumerate(otp_without_check_digit)
             )
             check_digit = cls._CHECK_DIGIT_MAP[char_sum % 25]
-        except KeyError:
-            raise ValidationError("The OTP code contains forbidden characters.")
+        except KeyError as error:
+            raise ValidationError("The OTP code contains forbidden characters.") from error
         return check_digit
 
     @classmethod

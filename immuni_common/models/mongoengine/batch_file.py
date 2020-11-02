@@ -131,6 +131,6 @@ class BatchFile(Document):
             result = next(cls.objects.aggregate(*cls._get_oldest_and_newest_indexes_pipeline(days)))
             result["oldest"] = int(result["oldest"])
             result["newest"] = int(result["newest"])
-        except StopIteration:
-            raise NoBatchesException()
+        except StopIteration as error:
+            raise NoBatchesException() from error
         return result

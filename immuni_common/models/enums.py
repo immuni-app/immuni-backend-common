@@ -37,9 +37,9 @@ class EnvarEnum(Enum):
         """
         try:
             return cls(value)  # type: ignore
-        except ValueError:
+        except ValueError as error:
             allowed = ", ".join(e.value for e in cls)  # type: ignore
-            raise ImmuniException(f"Invalid environment: {value} (allowed: {allowed})")
+            raise ImmuniException(f"Invalid environment: {value} (allowed: {allowed})") from error
 
 
 class Environment(EnvarEnum):
