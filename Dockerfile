@@ -3,7 +3,7 @@ FROM python:3.8-buster AS build
 WORKDIR /app
 ENV VIRTUAL_ENV /app/.venv
 ENV POETRY_HOME /app/.poetry
-ENV POETRY_VERSION 1.0.5
+ENV POETRY_VERSION 1.1.4
 ENV PATH $POETRY_HOME/bin:$VIRTUAL_ENV/bin:$PATH
 # Prometheus requires this envar name for multiprocess, and it has to be an absolute path.
 ENV prometheus_multiproc_dir /app/.prometheus/multiproc
