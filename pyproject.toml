@@ -67,7 +67,7 @@ python-json-logger = "==0.1.11"
 prometheus_client = "==0.7.1"
 sanic = "==19.9.0"  # NOTE: bump after https://github.com/huge-success/sanic/issues/1749 is fixed
 sanic-openapi = "==0.6.0"  # NOTE: bump after the issue with the Swagger schema validator is fixed
-uvicorn = "==0.11.5"
+uvicorn = "==0.12.2"
 
 [tool.poetry.extras]
 aioredis = ["aioredis"]
