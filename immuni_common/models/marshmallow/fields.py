@@ -107,14 +107,14 @@ class IntegerBoolField(Field):
 
     def __init__(self, *args: Any, allow_strings: bool = False, **kwargs: Any) -> None:
         self.allow_strings = allow_strings
-        super(IntegerBoolField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _deserialize(self, value: Any, attr: Any, data: Any, **kwargs: Any) -> bool:
         if self.allow_strings and isinstance(value, str):
             try:
                 value = int(value)
-            except ValueError:
-                raise ValidationError(f"{value} is not a valid integer.")
+            except ValueError as error:
+                raise ValidationError(f"{value} is not a valid integer.") from error
 
         if isinstance(value, int) and not isinstance(value, bool) and 0 <= value <= 1:
             return bool(value)

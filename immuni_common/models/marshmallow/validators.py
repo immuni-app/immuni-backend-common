@@ -53,8 +53,8 @@ class Base64StringValidator(Validator):
 
         try:
             decoded = base64.b64decode(value)
-        except binascii.Error:
-            raise ValidationError("Invalid base64 string.")
+        except binascii.Error as error:
+            raise ValidationError("Invalid base64 string.") from error
         if self._length and (length := len(decoded)) != self._length:
             raise ValidationError(
                 f"Invalid base64 string length: {length} instead of {self._length}."
