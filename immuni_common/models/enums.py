@@ -108,12 +108,11 @@ class TransmissionRiskLevel(Enum):
     See https://developer.apple.com/documentation/exposurenotification/enexposureinfo/3583716-transmissionrisklevel#discussion  # noqa: E501, pylint: disable=line-too-long
     """
 
-    # TODO: Use all uppercase names. It may require a database migration.
-    unused_custom = 0
-    confirmed_test_low = 1
-    confirmed_test_standard = 2
-    confirmed_test_high = 3
-    confirmed_clinical_diagnosis = 4
-    self_report = 5
-    negative_case = 6
-    recursive_case = 7
+    UNUSED_CUSTOM = 0
+    CONFIRMED_TEST_LOW = 1
+    CONFIRMED_TEST_STANDARD = 2
+    CONFIRMED_TEST_HIGH = 3
+    CONFIRMED_CLINICAL_DIAGNOSIS = 4
+    SELF_REPORT = 5
+    NEGATIVE_CASE = 6
+    RECURSIVE_CASE = 7
