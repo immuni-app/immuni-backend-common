@@ -44,7 +44,7 @@ def batch_files_eu() -> List[BatchFileEu]:
                     keys=[
                         TemporaryExposureKey(
                             key_data=generate_random_key_data_eu(),
-                            transmission_risk_level=TransmissionRiskLevel.highest,
+                            transmission_risk_level=TransmissionRiskLevel.CONFIRMED_TEST_HIGH,
                             rolling_start_number=int(
                                 datetime.utcnow().timestamp()
                                 / timedelta(minutes=10).total_seconds()

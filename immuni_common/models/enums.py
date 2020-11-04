@@ -103,15 +103,17 @@ class Platform(Enum):
 class TransmissionRiskLevel(Enum):
     """
     Enumeration of the different transmission risk levels.
+
+    Taken from the official Apple documentation.
+    See https://developer.apple.com/documentation/exposurenotification/enexposureinfo/3583716-transmissionrisklevel#discussion  # noqa: E501, pylint: disable=line-too-long
     """
 
-    # TODO: Use all uppercase names. It may require a database migration.
-    none = 0
-    lowest = 1
-    low = 2
-    low_medium = 3
-    medium = 4
-    medium_high = 5
-    high = 6
-    very_high = 7
-    highest = 8
+    UNUSED_CUSTOM = 0
+    CONFIRMED_TEST_LOW = 1
+    CONFIRMED_TEST_STANDARD = 2
+    CONFIRMED_TEST_HIGH = 3
+    CONFIRMED_CLINICAL_DIAGNOSIS = 4
+    SELF_REPORT = 5
+    NEGATIVE_CASE = 6
+    RECURSIVE_CASE = 7
+    highest = 8  # TODO: remove after migrating Mongo document to use CONFIRMED_TEST_HIGH
