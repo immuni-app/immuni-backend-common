@@ -116,3 +116,4 @@ class TransmissionRiskLevel(Enum):
     SELF_REPORT = 5
     NEGATIVE_CASE = 6
     RECURSIVE_CASE = 7
+    highest = 8  # TODO: remove after migrating Mongo document to use CONFIRMED_TEST_HIGH
