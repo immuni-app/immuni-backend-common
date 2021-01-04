@@ -47,12 +47,12 @@ class Base64String(String):
     """
 
     def __init__(
-        self,
-        *args: Any,
-        length: Optional[int] = None,
-        min_encoded_length: Optional[int] = None,
-        max_encoded_length: Optional[int] = None,
-        **kwargs: Any,
+            self,
+            *args: Any,
+            length: Optional[int] = None,
+            min_encoded_length: Optional[int] = None,
+            max_encoded_length: Optional[int] = None,
+            **kwargs: Any,
     ) -> None:
         """
         :param args: the positional arguments of the String field.
@@ -170,3 +170,12 @@ class Countries(List):
             missing=None,
             validate=Length(min=0, max=27),
         )
+
+
+class LastHisNumbers(String):
+    """
+    Validate the last eight numbers of the HIS card.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(required=True, validate=validate.Regexp(r"^[0-9]{8}$"))

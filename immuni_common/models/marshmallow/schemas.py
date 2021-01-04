@@ -34,7 +34,7 @@ class OtpDataSchema(Schema):
     """
     Validate and deserialize the raw data into the corresponding OtpData object.
     """
-
+    id_transaction = fields.String(required=False)
     symptoms_started_on = IsoDate()
 
     @post_load
@@ -62,7 +62,7 @@ class TemporaryExposureKeySchema(Schema):
 
     @post_load
     def create_tek(  # pylint: disable=no-self-use
-        self, data: Dict, **kwargs: Any
+            self, data: Dict, **kwargs: Any
     ) -> TemporaryExposureKey:
         """
         Return the TemporaryExposureKey object associated with the deserialized data.
@@ -88,7 +88,7 @@ class ExposureInfoSchema(Schema):
 
     @post_load
     def create_exposure_info(  # pylint: disable=no-self-use
-        self, data: Dict, **kwargs: Any
+            self, data: Dict, **kwargs: Any
     ) -> ExposureInfo:
         """
         Return the ExposureInfo object associated with the deserialized data.
