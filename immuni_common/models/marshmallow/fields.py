@@ -179,3 +179,13 @@ class LastHisNumbers(String):
 
     def __init__(self) -> None:
         super().__init__(required=True, validate=validate.Regexp(r"^[0-9]{8}$"))
+
+
+class IdTransaction(String):
+    """
+    Validate the id of the transaction returned from HIS service after the request to verify
+    the CUN.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(required=False, validate=validate.Regexp(r"^[A-Fa-f0-9\-]{36}$"))

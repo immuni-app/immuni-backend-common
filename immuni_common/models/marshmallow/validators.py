@@ -13,6 +13,7 @@
 
 import base64
 import binascii
+import re
 from datetime import date, timedelta
 from typing import Iterable, Optional
 
@@ -21,6 +22,8 @@ from marshmallow.validate import Validator
 
 from immuni_common.core import config
 
+OTP_LENGTH = 10
+
 
 class Base64StringValidator(Validator):
     """
@@ -28,10 +31,10 @@ class Base64StringValidator(Validator):
     """
 
     def __init__(
-        self,
-        length: Optional[int],
-        min_encoded_length: Optional[int],
-        max_encoded_length: Optional[int],
+            self,
+            length: Optional[int],
+            min_encoded_length: Optional[int],
+            max_encoded_length: Optional[int],
     ) -> None:
         super().__init__()
         self._length = length
@@ -90,7 +93,6 @@ class OtpCodeValidator(Validator):
     A validator for the defined OTP format.
     """
 
-    _OTP_LENGTH = 10
     _ODD_MAP = {
         "1": 0,
         "2": 5,
@@ -176,8 +178,12 @@ class OtpCodeValidator(Validator):
     _CHECK_DIGIT_MAP = dict(enumerate(_ALPHABET))
 
     def __call__(self, value: str) -> str:
-        if not self._is_valid_otp(value):
-            raise ValidationError("Invalid OTP code.")
+        if len(value) == OTP_LENGTH:
+            if not self._is_valid_otp(value):
+                raise ValidationError("Invalid OTP code.")
+        else:
+            if not self._is_valid_otp_sha(value):
+                raise ValidationError("Invalid OTP SHA256 code.")
         return value
 
     @classmethod
@@ -206,8 +212,20 @@ class OtpCodeValidator(Validator):
         :param otp: the OTP code to validate.
         :return: True if the OTP code is valid, False otherwise.
         """
-        if len(otp) != cls._OTP_LENGTH:
+        if len(otp) != OTP_LENGTH:
             return False
         expected = otp[-1]
         computed = cls._compute_check_digit(otp[:-1])
         return expected == computed
+
+    @classmethod
+    def _is_valid_otp_sha(cls, otp: str) -> bool:
+        """
+        Assess whether the OTP code is a valid sha256.
+
+        :param otp: the OTP code to validate.
+        :return: True if the OTP code is valid, False otherwise.
+        """
+        if otp is None or not re.match(r"^[A-Fa-f0-9]{64}$", otp):
+            return False
+        return True
