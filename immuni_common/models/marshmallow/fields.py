@@ -188,4 +188,5 @@ class IdTransaction(String):
     """
 
     def __init__(self) -> None:
-        super().__init__(required=False, validate=validate.Regexp(r"^[A-Fa-f0-9\-]{36}$"))
+        super().__init__(required=False, missing=None,
+                         validate=validate.Regexp(r"^[A-Fa-f0-9\-]{36}$"))
