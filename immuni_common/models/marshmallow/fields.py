@@ -172,7 +172,7 @@ class Countries(List):
         )
 
 
-class LastHisNumbers(String):
+class LastHisNumber(String):
     """
     Validate the last eight numbers of the HIS card.
     """
