@@ -181,9 +181,9 @@ class LastHisNumber(String):
         super().__init__(required=True, validate=validate.Regexp(r"^[0-9]{8}$"))
 
 
-class IdTransaction(String):
+class IdTestVerification(String):
     """
-    Validate the id of the transaction returned from HIS service after the request to verify
+    Validate the id of the test returned from HIS service after the request to verify
     the CUN.
     """
 

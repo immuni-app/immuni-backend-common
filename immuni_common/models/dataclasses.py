@@ -13,7 +13,7 @@
 
 from dataclasses import dataclass
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 from immuni_common.models.enums import TransmissionRiskLevel
 
@@ -51,5 +51,5 @@ class OtpData:
     """
     Information associated with an OTP received from the health information system (HIS).
     """
-    id_transaction: str
+    id_test_verification: Optional[str]
     symptoms_started_on: date
