@@ -139,7 +139,7 @@ def test_otp_code_success(otp: str) -> None:
         "XZ2LR2245X",
         "A6F3XQQ1YA",
         "HL2S4U3A6H",
-        "b39e0733843b1b5d7c558f52f117a824dc41216e0c2bb671b3d79ba82105dd94784728afb",  # not valid sha256
+        "b39e0733843b1b5d7c558f52f117a824dc41216e0c2bb671b3d79ba82105dd94784728afb",
         *(v for v in _COMMON_INVALID_FIELD_VALUES if hasattr(v, "__len__")),
     ),
 )

@@ -16,13 +16,13 @@ from logging import Logger
 from types import ModuleType
 from typing import Any, Callable, Dict, ItemsView, Iterable, Optional, Union
 
+from prometheus_client.exposition import start_http_server
+
 from celery import Celery
 from celery.schedules import crontab
 from celery.signals import after_setup_logger
 from celery.task import Task
 from croniter import croniter
-from prometheus_client.exposition import start_http_server
-
 from immuni_common.core import config
 from immuni_common.helpers.logging import setup_celery_logger
 from immuni_common.helpers.utils import dense_dict, modules_in_package
