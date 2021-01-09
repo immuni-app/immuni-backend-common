@@ -51,5 +51,6 @@ class OtpData:
     """
     Information associated with an OTP received from the health information system (HIS).
     """
+
     id_test_verification: Optional[str]
     symptoms_started_on: date

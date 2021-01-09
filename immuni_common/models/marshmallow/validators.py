@@ -31,10 +31,10 @@ class Base64StringValidator(Validator):
     """
 
     def __init__(
-            self,
-            length: Optional[int],
-            min_encoded_length: Optional[int],
-            max_encoded_length: Optional[int],
+        self,
+        length: Optional[int],
+        min_encoded_length: Optional[int],
+        max_encoded_length: Optional[int],
     ) -> None:
         super().__init__()
         self._length = length
@@ -226,6 +226,6 @@ class OtpCodeValidator(Validator):
         :param otp: the OTP code to validate.
         :return: True if the OTP code is valid, False otherwise.
         """
-        if otp is None or not re.match(r"^[A-Fa-f0-9]{64}$", otp):
+        if otp is None or not re.match(r"^[A-Fa-f0-9]{64}$", str(otp)):
             return False
         return True

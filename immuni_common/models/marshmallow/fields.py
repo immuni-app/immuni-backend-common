@@ -47,12 +47,12 @@ class Base64String(String):
     """
 
     def __init__(
-            self,
-            *args: Any,
-            length: Optional[int] = None,
-            min_encoded_length: Optional[int] = None,
-            max_encoded_length: Optional[int] = None,
-            **kwargs: Any,
+        self,
+        *args: Any,
+        length: Optional[int] = None,
+        min_encoded_length: Optional[int] = None,
+        max_encoded_length: Optional[int] = None,
+        **kwargs: Any,
     ) -> None:
         """
         :param args: the positional arguments of the String field.
@@ -188,5 +188,6 @@ class IdTestVerification(String):
     """
 
     def __init__(self) -> None:
-        super().__init__(required=False, missing=None,
-                         validate=validate.Regexp(r"^[A-Fa-f0-9\-]{36}$"))
+        super().__init__(
+            required=False, missing=None, validate=validate.Regexp(r"^[A-Fa-f0-9\-]{36}$")
+        )
