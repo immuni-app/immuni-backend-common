@@ -14,13 +14,13 @@
 from datetime import datetime
 from typing import Any, Dict, Tuple
 
+from pytest import fixture
+
 from celery import Celery
 from celery.apps.worker import Worker
 from celery.local import PromiseProxy
 from celery.schedules import crontab
 from celery.task import Task
-from pytest import fixture
-
 from immuni_common.celery import CeleryApp, Schedule, _overall_schedule
 from tests import fake_tasks_module
 from tests.conftest import REDIS_URL

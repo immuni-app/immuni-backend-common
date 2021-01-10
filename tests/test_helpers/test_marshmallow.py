@@ -24,8 +24,10 @@ from immuni_common.models.marshmallow.fields import (
     Base64String,
     Countries,
     EnumField,
+    IdTestVerification,
     IntegerBoolField,
     IsoDate,
+    LastHisNumber,
     OtpCode,
     Province,
 )
@@ -108,6 +110,7 @@ def test_base64_string_length(value: str) -> None:
         "FQ2YQE43LR",
         "87S8QWH1EE",
         "527AZ66UHX",
+        "b39e0733843b1b5d7c558f52f117a824dc41216e0c2bb671b3d79ba82105dd94",
         generate_otp(),
     ),
 )
@@ -136,6 +139,7 @@ def test_otp_code_success(otp: str) -> None:
         "XZ2LR2245X",
         "A6F3XQQ1YA",
         "HL2S4U3A6H",
+        "b39e0733843b1b5d7c558f52f117a824dc41216e0c2bb671b3d79ba82105dd94784728afb",
         *(v for v in _COMMON_INVALID_FIELD_VALUES if hasattr(v, "__len__")),
     ),
 )
@@ -258,3 +262,23 @@ def test_integerbool_field(value: int) -> None:
 def test_integerbool_field_raises(value: Any) -> None:
     with raises(ValidationError):
         IntegerBoolField()._deserialize(value, None, None)
+
+
+@mark.parametrize("value", ["FCA", "123456", "12345A569", "00981", "123456789"])
+def test_last_his_number_failure(value: str) -> None:
+    with raises(ValidationError):
+        LastHisNumber().validate(value)  # type:ignore
+
+
+@mark.parametrize(
+    "value",
+    [
+        "2d8af3b92c0a4efc9e1572454f994e1f",
+        "d8af3b9-2c0a-4efc-9e15-72454f994e1f",
+        "72454f994e1f2c0a-4efc-9e15-d8af3b9",
+        "123456789jshq04251701",
+    ],
+)
+def test_id_test_verification_failure(value: str) -> None:
+    with raises(ValidationError):
+        IdTestVerification().validate(value)  # type:ignore

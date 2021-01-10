@@ -170,3 +170,24 @@ class Countries(List):
             missing=None,
             validate=Length(min=0, max=27),
         )
+
+
+class LastHisNumber(String):
+    """
+    Validate the last eight numbers of the HIS card.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(required=True, validate=validate.Regexp(r"^[0-9]{8}$"))
+
+
+class IdTestVerification(String):
+    """
+    Validate the id of the test returned from HIS service after the request to verify
+    the CUN.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            required=False, missing=None, validate=validate.Regexp(r"^[A-Fa-f0-9\-]{36}$")
+        )

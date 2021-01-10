@@ -35,6 +35,7 @@ class OtpDataSchema(Schema):
     Validate and deserialize the raw data into the corresponding OtpData object.
     """
 
+    id_test_verification = fields.String(required=False, missing=None)
     symptoms_started_on = IsoDate()
 
     @post_load

@@ -18,7 +18,6 @@ import pathlib
 from typing import Callable
 
 from croniter import croniter
-
 from immuni_common.core.exceptions import ImmuniException
 
 _LOGGER = logging.getLogger(__name__)
