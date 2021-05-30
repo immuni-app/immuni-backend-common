@@ -88,24 +88,6 @@ class IsoDateValidator(Validator):
             raise ValidationError(f"{value} is too far back in time.")
 
 
-class HisCardExpiringDateValidator(Validator):
-    """
-    A validator for HIS (Health Information System) card expiring date.
-    """
-
-    def __call__(self, value: date) -> None:
-        """
-        Validate the date object.
-
-        :param value: the date object to validate.
-        :raises:
-          ValidationError: if the date is in the past.
-        """
-        today = date.today()
-        if value < today:
-            raise ValidationError(f"{value} is in the past.")
-
-
 class OtpCodeValidator(Validator):
     """
     A validator for the defined OTP format.
