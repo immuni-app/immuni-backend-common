@@ -119,12 +119,12 @@ class TransmissionRiskLevel(Enum):
     highest = 8  # TODO: remove after migrating Mongo document to use CONFIRMED_TEST_HIGH
 
 
-class AuthCodeType(Enum):
+class TokenType(Enum):
     """
-    Enumeration of the possible auth code types.
+    Enumeration of the possible token types.
     """
 
     CUN = "cun"
     NRFE = "nrfe"
     NUCG = "nucg"
-    OTP = "otp"
+    AUTHCODE = "authcode"
