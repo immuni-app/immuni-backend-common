@@ -43,6 +43,16 @@ class SchemaValidationException(ApiException):
     error_code = 1001
 
 
+class DgcNotFoundException(ApiException):
+    """
+    Raised when there is no DGC found, at all.
+    """
+
+    status_code = HTTPStatus.NOT_FOUND
+    error_message = "No DGC found."
+    error_code = 1102
+
+
 # 1100-1199: immuni-exposure-ingestion
 
 

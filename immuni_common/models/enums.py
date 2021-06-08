@@ -117,3 +117,14 @@ class TransmissionRiskLevel(Enum):
     NEGATIVE_CASE = 6
     RECURSIVE_CASE = 7
     highest = 8  # TODO: remove after migrating Mongo document to use CONFIRMED_TEST_HIGH
+
+
+class TokenType(Enum):
+    """
+    Enumeration of the possible token types.
+    """
+
+    CUN = "cun"
+    NRFE = "nrfe"
+    NUCG = "nucg"
+    AUTHCODE = "authcode"
