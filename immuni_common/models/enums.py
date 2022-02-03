@@ -128,3 +128,4 @@ class TokenType(Enum):
     NRFE = "nrfe"
     NUCG = "nucg"
     AUTHCODE = "authcode"
+    CUEV = "cuev"
